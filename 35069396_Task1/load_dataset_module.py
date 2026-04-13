@@ -1,10 +1,10 @@
 import csv
 
-class LoadDataset():
+class LoadDataset:
     """
     Class to load and parse the dataset
     """
-    def __init__(self, file_path: str):
+    def __init__(self, file_path):
         self.data = []
         self.file_path = file_path
         # helpful to inform the user if there were missing values 
@@ -17,17 +17,36 @@ class LoadDataset():
         """
         try:
             with open(self.file_path, 'r') as f:
-                csv_reader = csv.DictReader(f)
+                csv_reader = csv.reader(f)
+                # get header from first row
+                try:
+                    headers = next(csv_reader)
+                except StopIteration:
+                    print("Error: The file is empty.")
+                    return None
 
-                for index, row in enumerate(csv_reader, 1):
+                row_number = 1
+
+                for values in csv_reader:
+                    row_number += 1
+                    row = {}
+                    i = 0
+                    while i < len(headers):
+                        if i < len(values):
+                            row[headers[i]] = values[i]
+                        else:
+                            # if there are columns with headers without content
+                            row[headers[i]] = ""
+                        i = i + 1
                     try: 
                         parsed_row = self.parse_row(row)
                         self.data.append(parsed_row)
                     except Exception as e:
-                        print(f"Error while parsing of row {index}: {e}. Row will be skipped.")            
+                        print(f"Error while parsing row {row_number}: {e}. Row will be skipped.")            
+            
             # information about missing values or unexpected problems while parsing a value
             if self.missing_values_count > 0:
-                print(f"\033[93mWARNING: {self.missing_values_count} values could not be parsed correctly or were empty/missing values. They entered 'None' in the record.\033[0m")
+                print(f"WARNING: {self.missing_values_count} values could not be parsed correctly or were empty/missing values. They entered 'None' in the record.")
             else:
                 print(f"Successfully loaded patient data: {len(self.data)}")
             return self.data
@@ -36,10 +55,10 @@ class LoadDataset():
             print(f"Error: The File {self.file_path} was not found.")
             return None
         except Exception as e:
-            print(f"Unnkown Error while loading the dataset: {e}")
+            print(f"Unknown Error while loading the dataset: {e}")
             return None
 
-    def _catch_missing_values(value) -> bool:
+    def catch_missing_values(self, value):
         """
         Returns True if a value represents a missing value (e.g. NaN)
         """
@@ -49,13 +68,12 @@ class LoadDataset():
         if isinstance(value, str):
             value = value.strip().lower()
 
-        match value:
-            case "" | "nan" | "none" | "null" | "n/a" | None:
-                return True
-            case _:
-                return False
+        if value == "" or value == "nan" or value == "none" or value == "null" or value == "n/a":
+            return True
+        else:
+            return False
 
-    def parse_row(self, row: dict):
+    def parse_row(self, row):
         """
         Parse a row with converting into int or float if necessary/possible
         """
@@ -68,7 +86,7 @@ class LoadDataset():
             if not clean_key:
                 continue
             # catch empty values ("") or "NaN" or "NN"
-            if self._catch_missing_values(clean_value):
+            if self.catch_missing_values(clean_value):
                 parsed_data[clean_key] = None
                 # count empty values to inform the user that values are missing
                 self.missing_values_count += 1
@@ -88,10 +106,8 @@ class LoadDataset():
             except ValueError:
                 # if it is not a number stay being a string
                 parsed_data[clean_key] = clean_value
-            except Exception as e:
-                # normally this exception will never happen because DictReader of csv
-                # garantees that we get all values as strings
-                # but for defensive programming reasons, I decided to add this
+            except Exception:
+                # in case something unexpected gone wrong
                 parsed_data[clean_key] = None
                 self.missing_values_count += 1
         
