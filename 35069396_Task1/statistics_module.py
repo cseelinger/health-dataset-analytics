@@ -33,25 +33,16 @@ class StatisticsModule:
     @staticmethod
     def calculate_mode(values):
         counts = {}
-
-        for value in values:
-            if value in counts:
-                counts[value] = counts[value] + 1
-            else:
-                counts[value] = 1
-
-        max_count = max(counts.values())
-
-        mode_values = []
-        for key, count in counts.items():
-            if count == max_count:
-                mode_values.append(key)
-
-        if len(mode_values) == 1:
-            return mode_values[0]
-        else:
-            # no unique mode found
-            return None
+        for val in values:
+            counts[val] = counts.get(val, 0) + 1
+        
+        max_val = values[0]
+        max_count = 0
+        for val, count in counts.items():
+            if count > max_count:
+                max_count = count
+                max_val = val
+        return max_val
     
     @staticmethod
     def calculate_variance(values):
@@ -63,8 +54,7 @@ class StatisticsModule:
 
         for value in values:
             squared_diff_sum = squared_diff_sum + (value - mean_value) ** 2
-        # calculate sample variance by dividing through len(values) - 1
-        return squared_diff_sum / (len(values) - 1)
+        return squared_diff_sum / (len(values))
     
     @staticmethod
     def calculate_std_dev(values):
@@ -86,7 +76,7 @@ class StatisticsModule:
     def calculate_range(values):
         return max(values) - min(values)
 
-    def get_descriptive_statistics_for_feature(self, feature_name):
+    def get_descriptive_statistics_for_feature(self, column):
         """
         Takes a column name as input and calculates all relevant statistics.
         Returns a dictionary containing the results.
@@ -95,34 +85,43 @@ class StatisticsModule:
             # 1. Extract all valid (non-null) numeric values from the column
             values = []
             for row in self.dataset:
-                val = row.get(feature_name)
-                # Check whether the value is a number (int or float) and exists
-                # ignore booleans although bool is a subtype of int in Python
-                if isinstance(val, (int, float)) and not isinstance(val, bool):
+                val = row.get(column)
+                # Check whether the value is a number (int or float)
+                if type(val) == int or type(val) == float:
                     values.append(val)
 
             # 2. Check whether we have found any figures that can be analysed at all
             if not values:
-                raise ValueError(f"No numerical data for the feature '{feature_name}' found.")
+                raise ValueError(f"No numerical data for the feature '{column}' found.")
 
-            # 3. Calculate statistics and store them in a dictionary
+            # 3. Calculate statistics 
+            mean = round(self.calculate_mean(values), 2)
+            median = round(self.calculate_median(values), 2)
+            mode = self.calculate_mode(values)
+            stdv = round(self.calculate_std_dev(values), 2)
+            variance = round(self.calculate_variance(values), 2)
+            minimum = self.calculate_min(values)
+            maximum = self.calculate_max(values)
+            rangee = self.calculate_range(values)
+
+            # 4. store them in a dictionary
             stats = {
-                "Feature": feature_name,
+                "Feature": column,
                 "Count (valid values)": len(values),
-                "Mean": round(self.calculate_mean(values), 2),
-                "Median": round(self.calculate_median(values), 2),
-                "Mode": self.calculate_mode(values),
-                "Standard Deviation": round(self.calculate_std_dev(values), 2),
-                "Variance": round(self.calculate_variance(values), 2),
-                "Minimum": self.calculate_min(values),
-                "Maximum": self.calculate_max(values),
-                "Range": self.calculate_range(values)
+                "Mean": mean,
+                "Median": median,
+                "Mode": mode,
+                "Standard Deviation": stdv,
+                "Variance": variance,
+                "Minimum": minimum,
+                "Maximum": maximum,
+                "Range": rangee
             }
             return stats
 
-        except ValueError as ve:
-            print(f"Error in statistical analysis: {ve}")
+        except ValueError as e:
+            print(f"Error in {column}: {e}")
             return None
         except Exception as e:
-            print(f"An unexpected error has occurred: {e}")
+            print(f"An unexpected Error has occurred: {e}")
             return None

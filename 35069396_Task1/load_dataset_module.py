@@ -1,4 +1,5 @@
 import csv
+import pandas as pd
 
 class LoadDataset:
     """
@@ -7,9 +8,6 @@ class LoadDataset:
     def __init__(self, file_path):
         self.data = []
         self.file_path = file_path
-        # helpful to inform the user if there were missing values 
-        # or unexpected problems occured
-        self.missing_values_count = 0
 
     def load_dataset(self):
         """
@@ -21,8 +19,8 @@ class LoadDataset:
                 # get header from first row
                 try:
                     headers = next(csv_reader)
-                except StopIteration:
-                    print("Error: The file is empty.")
+                except Exception:
+                    print("ERROR: The file is empty.")
                     return None
 
                 row_number = 1
@@ -44,15 +42,11 @@ class LoadDataset:
                     except Exception as e:
                         print(f"Error while parsing row {row_number}: {e}. Row will be skipped.")            
             
-            # information about missing values or unexpected problems while parsing a value
-            if self.missing_values_count > 0:
-                print(f"WARNING: {self.missing_values_count} values could not be parsed correctly or were empty/missing values. They entered 'None' in the record.")
-            else:
-                print(f"Successfully loaded patient data: {len(self.data)}")
+            print(f"Successfully loaded patient data: {len(self.data)}")
             return self.data
 
         except FileNotFoundError:
-            print(f"Error: The File {self.file_path} was not found.")
+            print(f"ERROR: The File {self.file_path} was not found.")
             return None
         except Exception as e:
             print(f"Unknown Error while loading the dataset: {e}")
@@ -64,51 +58,45 @@ class LoadDataset:
         """
         if value is None:
             return True
+        
+        missing_values = ["", "nan", "NaN", "nan", "none", "null", "Null", "N/A", "n/a", "nn", "NN"]
 
-        if isinstance(value, str):
-            value = value.strip().lower()
-
-        if value == "" or value == "nan" or value == "none" or value == "null" or value == "n/a":
+        if value in missing_values:
             return True
         else:
             return False
 
     def parse_row(self, row):
         """
-        Parse a row with converting into int or float if necessary/possible
+        Method parsing a row with converting into int or float if necessary/possible
         """
-        parsed_data = {}
+        result_row = {}
         for key, value in row.items():
             # clear each key and value to coninue (delete spaces)
-            clean_key = key.strip() if key else key
-            clean_value = value.strip() if isinstance(value, str) else value
+            key = key.strip() if key else key
+            val = value.strip() if isinstance(value, str) else value
             # continue if there is now no key
-            if not clean_key:
+            if not key:
                 continue
-            # catch empty values ("") or "NaN" or "NN"
-            if self.catch_missing_values(clean_value):
-                parsed_data[clean_key] = None
-                # count empty values to inform the user that values are missing
-                self.missing_values_count += 1
+            # catch empty values ("") or "NaN" or "NN" etc. -> set to None
+            if self.catch_missing_values(val):
+                result_row[key] = None
+                # skip remaining code
                 continue
 
             # parse data to int/float if possible
             try:
-                # first try to convert into float
-                float_value = float(clean_value)
-                # check the possibility of the value being an int
-                if float_value.is_integer():
-                    # it is an integer
-                    parsed_data[clean_key] = int(float_value)
-                else:
-                    # it is a float
-                    parsed_data[clean_key] = float_value
+                # try converting into int
+                result_row[key] = int(val)
             except ValueError:
-                # if it is not a number stay being a string
-                parsed_data[clean_key] = clean_value
+                try:
+                    # try converting into float (it is not int)
+                    result_row[key] = float(val)
+                except ValueError:
+                    # not int or float -> string
+                    result_row[key] = val
             except Exception:
                 # in case something unexpected gone wrong
-                parsed_data[clean_key] = None
-                self.missing_values_count += 1
+                result_row[key] = None
         
-        return parsed_data
+        return result_row
