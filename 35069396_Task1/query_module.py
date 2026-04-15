@@ -51,13 +51,12 @@ def query_smokers_hypertension(data):
         # 2. Statistics (uses statistics_module)
         all_stats = {
             "Query": "Smokers (or Former Smokers) with Hypertension",
-            "Count": len(ages),
             "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
             "Median Age": round(StatisticsModule.calculate_median(ages), 2),
             "Modal Age": StatisticsModule.calculate_mode(ages)
         }
-        result.append(all_stats)
-        return result
+        # build result
+        return [all_stats]
 
     except Exception as e:
         print(f"Error in Query i (smokers hypertension): {e}")
@@ -93,15 +92,12 @@ def query_heart_disease(data):
         # 2. Statistics (uses statistics_module)
         all_stats = {
             "Query": "Patients with Heart Diseases",
-            "Count": len(ages),
             "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
             "Median Age": round(StatisticsModule.calculate_median(ages), 2),
             "Modal Age": StatisticsModule.calculate_mode(ages),
             "Average Glucose Level": round(StatisticsModule.calculate_mean(glucoses), 2)
         }
-        result = []
-        result.append(all_stats)
-        return result
+        return [all_stats]
 
     except Exception as e:
         print(f"Error in Query ii (heart diseases): {e}")
@@ -150,19 +146,13 @@ def query_hypertension_stroke_by_gender(data):
                         "Query": "Hypertension by Gender and Stroke Status",
                         "Gender": gender,
                         "Stroke Occurrence": "Yes" if stroke_status == "Stroke" else "No",
-                        "Count": len(ages),
                         "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                         "Median Age": round(StatisticsModule.calculate_median(ages), 2),
                         "Modal Age": StatisticsModule.calculate_mode(ages)
                     }
 
-        result = []
-        result.append(all_info)
-
-        if not result:
-            return [{"Message": "No suitable patients found."}]
-
-        return result
+        # build result
+        return [all_info]
 
     except Exception as e:
         print(f"Error in Query iii (hypertension stroke by gender): {e}")
@@ -203,8 +193,7 @@ def query_averages_physical_activity_level(data):
             if type(stroke_risk) == int or type(stroke_risk) == float:
                 activities_values[activity]["stroke_risk"].append(stroke_risk)
 
-        # build result list
-        result = []
+        # build result dict
         averages = {}
 
         for level, values in activities_values.items():
@@ -216,13 +205,8 @@ def query_averages_physical_activity_level(data):
                             "Average Glucose Level": round(StatisticsModule.calculate_mean(values["glucose"]), 2),
                             "Average Stroke Risk Score": round(StatisticsModule.calculate_mean(values["stroke_risk"]), 2)
                         }
-
-        result.append(averages)
-
-        if not result:
-            return [{"Message": "No suitable patients found."}]
-
-        return result
+        # build result
+        return [averages]
 
     except Exception as e:
         print(f"Error in Query iv (averages physical activity level): {e}")
@@ -255,40 +239,28 @@ def query_urban_vs_rural_areas_with_stroke(data):
             if residence == "Urban":
                 ages_urban.append(age)
         
-        # build result list
-        result = []
+        # build result dicts
         rural_dict = {}
         urban_dict = {}
-        if ages_rural:
-            # rural
-            rural_dict = {
-                        "Query": "Average values for Rural stroke patients",
-                        "Residence Type": "Rural",
-                        "Count": len(ages_rural),
-                        "Average Age": round(StatisticsModule.calculate_mean(ages_rural), 2),
-                        "Modal Age": StatisticsModule.calculate_mode(ages_rural),
-                        "Median Age": round(StatisticsModule.calculate_median(ages_rural), 2)
-                    }
-        if ages_urban:
-            # urban
-            urban_dict = {
-                        "Query": "Average values for Urban stroke patients",
-                        "Residence Type": "Urban",
-                        "Count": len(ages_urban),
-                        "Average Age": round(StatisticsModule.calculate_mean(ages_urban), 2),
-                        "Modal Age": StatisticsModule.calculate_mode(ages_urban),
-                        "Median Age": round(StatisticsModule.calculate_median(ages_urban), 2)
-                    }
-                    
+        # rural
+        rural_dict = {
+                    "Query": "Average values for Rural stroke patients",
+                    "Residence Type": "Rural",
+                    "Average Age": round(StatisticsModule.calculate_mean(ages_rural), 2),
+                    "Modal Age": StatisticsModule.calculate_mode(ages_rural),
+                    "Median Age": round(StatisticsModule.calculate_median(ages_rural), 2)
+                }
+        # urban
+        urban_dict = {
+                    "Query": "Average values for Urban stroke patients",
+                    "Residence Type": "Urban",
+                    "Average Age": round(StatisticsModule.calculate_mean(ages_urban), 2),
+                    "Modal Age": StatisticsModule.calculate_mode(ages_urban),
+                    "Median Age": round(StatisticsModule.calculate_median(ages_urban), 2)
+                }
+
         # build result
-        result = []
-        result.append(rural_dict)
-        result.append(urban_dict)
-
-        if not result:
-            return [{"Message": "No suitable patients found."}]
-
-        return result
+        return [rural_dict, urban_dict]
             
     except Exception as e:
         print(f"Error in Query v (urban vs rural areas with stroke): {e}")
@@ -307,9 +279,6 @@ def query_dietary_habits(data):
         habit = row.get("Dietary Habits")
         if habit not in habits:
             habits.append(habit)
-    
-    if not habits:
-        return [{"Message": "No Dietary Habits found."}]
 
     try:
         dietary_stroke = []
@@ -338,15 +307,79 @@ def query_dietary_habits(data):
             no_stroke_dict[habit] = dietary_no_stroke.count(habit)
 
         # build result
-        result = []
-        result.append(stroke_dict)
-        result.append(no_stroke_dict)
-
-        if not result:
-            return [{"Message": "No suitable patients found."}]
-        
-        return result
+        return [stroke_dict, no_stroke_dict]
 
     except Exception as e:
         print("Error in Query vi (dietary: stroke vs no stroke): {e}")
+        return []
+
+# ----------------------------------------------------------------
+# vii. Patients with hypertension and stroke
+# ----------------------------------------------------------------
+def query_hypertension_results_in_stroke(data):
+    """
+    Return all patients whose hypertension resulted in a stroke
+    """
+    try:
+        result = []
+        for row in data:
+            # get information
+            hypertension = row.get("Hypertension")
+            stroke = row.get("Stroke Occurrence")
+            # only add patient to list if they have hypertension and stroke
+            if hypertension == 1 and stroke == 1:
+                result.append(row)
+        return result
+    except Exception as e:
+        print("Error in Query vii (hypertension and stroke): {e}")
+        return []
+
+# ----------------------------------------------------------------
+# viii. Patients with heart diseases and stroke
+# ----------------------------------------------------------------
+def query_heart_diseases_and_stroke(data):
+    """
+    Return all patients who have a heart disease and had a stroke
+    """
+    try:
+        result = []
+        for row in data:
+            # get information
+            heart_disease = row.get("Heart Diseases")
+            stroke = row.get("Stroke Occurrence")
+            # only add patient to list if they have heart disease and stroke
+            if heart_disease == 1 and stroke == 1:
+                result.append(row)
+        return result
+    except Exception as e:
+        print("Error in Query viii (heart diseases and stroke): {e}")
+        return []
+
+# ----------------------------------------------------------------
+# ix. Average sleep hours of patients with and without stroke
+# ----------------------------------------------------------------
+def query_average_sleep_hours(data):
+    """
+    Calculate the average sleep hours for patients with and without a stroke
+    """
+    try:
+        sleep_no_stroke = []
+        sleep_stroke = []
+        for row in data:
+            stroke = row.get("Stroke Occurrence")
+            if stroke == 1:
+                sleep_stroke.append(row.get("Sleep Hours"))
+            if stroke == 0:
+                sleep_no_stroke.append(row.get("Sleep Hours"))
+        sleep_avg_stroke = {
+            "Query": "Average sleep hours of patients with stroke",
+            "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_stroke), 2)
+        }
+        sleep_avg_no_stroke = {
+            "Query": "Average sleep hours of patients with stroke",
+            "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_no_stroke), 2)
+        }
+        return [sleep_avg_stroke, sleep_avg_no_stroke]
+    except Exception as e:
+        print("Error in Query ix (average sleep hours): {e}")
         return []
