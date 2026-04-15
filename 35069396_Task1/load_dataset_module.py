@@ -3,17 +3,38 @@ import csv
 class LoadDataset:
     """
     Class to load and parse the dataset
+    data is stored in an array of dictionaries, e.g.
+    [   
+        <<-- first row -->>
+        {'ID': 1, 
+        'Age': 78, 
+        'Gender': 'Female', 
+        'Hypertension': 0, 
+        ...
+        'Stroke Occurrence': 0}, 
+
+        <<-- second row -->>
+        {'ID': 2, 
+        'Age': 60, 
+        'Gender': 'Female', 
+        'Hypertension': 0, 
+        ...},
+
+        <<-- next rows -->>
+    ]
     """
-    def __init__(self, file_path):
-        self.data = []
-        self.file_path = file_path
+    def __init__(self, filepath):
+        self.filepath = filepath
+        self.dataset = []
+        # directly load dataset
+        self.load_dataset()
 
     def load_dataset(self):
         """
-        Read and parse the dataset csv file
+        Read and parse the dataset csv file and store it directly in self.dataset
         """
         try:
-            with open(self.file_path, 'r') as f:
+            with open(self.filepath, 'r') as f:
                 csv_reader = csv.reader(f)
                 # get header from first row
                 try:
@@ -23,29 +44,33 @@ class LoadDataset:
                     return None
 
                 row_number = 1
-
-                for values in csv_reader:
+                # go through all rows
+                for row in csv_reader:
                     row_number += 1
-                    row = {}
+                    # new storage for the rows (dict)
+                    new_row = {}
                     i = 0
+                    # go through all columns and sort values to headers (key)
                     while i < len(headers):
-                        if i < len(values):
-                            row[headers[i]] = values[i]
+                        # get value just if there is content in this column
+                        if i < len(row):
+                            new_row[headers[i]] = row[i]
                         else:
                             # if there are columns with headers without content
-                            row[headers[i]] = ""
-                        i = i + 1
+                            new_row[headers[i]] = ""
+                        i += 1
                     try: 
-                        parsed_row = self.parse_row(row)
-                        self.data.append(parsed_row)
+                        # turn missing values into None and number into int/float
+                        parsed_row = self.process_row(new_row)
+                        self.dataset.append(parsed_row)
                     except Exception as e:
                         print(f"Error while parsing row {row_number}: {e}. Row will be skipped.")            
             
-            print(f"Successfully loaded patient data: {len(self.data)}")
-            return self.data
+            print(f"Successfully loaded patient data: {len(self.dataset)}")
+            return self.dataset
 
         except FileNotFoundError:
-            print(f"ERROR: The File {self.file_path} was not found.")
+            print(f"ERROR: The File {self.filepath} was not found.")
             return None
         except Exception as e:
             print(f"Unknown Error while loading the dataset: {e}")
@@ -58,44 +83,39 @@ class LoadDataset:
         if value is None:
             return True
         
-        missing_values = ["", "nan", "NaN", "nan", "none", "null", "Null", "N/A", "n/a", "nn", "NN"]
-
+        missing_values = ["", "nan", "NaN", "nan", "none", "None", "null", "Null", "N/A", "n/a", "nn", "NN"]
+        
+        # return true if it is a missing value so it can be set to None
         if value in missing_values:
             return True
         else:
             return False
 
-    def parse_row(self, row):
+    def process_row(self, current_row):
         """
         Method parsing a row with converting into int or float if necessary/possible
         """
-        result_row = {}
-        for key, value in row.items():
-            # clear each key and value to coninue (delete spaces)
-            key = key.strip() if key else key
-            val = value.strip() if isinstance(value, str) else value
-            # continue if there is now no key
-            if not key:
-                continue
+        row = {}
+        for key, value in current_row.items():
             # catch empty values ("") or "NaN" or "NN" etc. -> set to None
-            if self.catch_missing_values(val):
-                result_row[key] = None
-                # skip remaining code
+            if self.catch_missing_values(value):
+                row[key] = None
+                # skip remaining code in process_row
                 continue
 
             # parse data to int/float if possible
             try:
                 # try converting into int
-                result_row[key] = int(val)
+                row[key] = int(value)
             except ValueError:
                 try:
                     # try converting into float (it is not int)
-                    result_row[key] = float(val)
+                    row[key] = float(value)
                 except ValueError:
                     # not int or float -> string
-                    result_row[key] = val
+                    row[key] = value
             except Exception:
                 # in case something unexpected gone wrong
-                result_row[key] = None
+                row[key] = None
         
-        return result_row
+        return row
