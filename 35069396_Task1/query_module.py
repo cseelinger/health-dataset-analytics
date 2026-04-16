@@ -465,3 +465,43 @@ def query_filter_patients_by_criteria(data, age=None, minAge=None, maxAge=None, 
     except Exception as e:
         print(f"Error in Query x (feature extraction): {e}")
         return []
+
+# ----------------------------------------------------------------
+# xi. Categorize patients into stroke risk groups
+# ----------------------------------------------------------------
+def query_group_patients_stroke_risk(data):
+    """
+    Categorize patients into risk groups (Low, Medium, High) based on their stroke risk score.
+    Returns the count and percentage of patients in each category.
+    """
+    try:
+        # calculate risk groups through all stroke risk scores
+        low = []
+        medium = []
+        high = []
+        # sort patients into groups
+        for row in data:
+            stroke_risk_score = row.get("Stroke Risk Score")
+            if stroke_risk_score < 34:
+                low.append(row)
+            if stroke_risk_score > 66:
+                high.append(row)
+            else:
+                medium.append(row)
+        # store all information
+        result = []
+        levels = ["Low", "Medium", "High"]
+        index = 0
+        for group in [low, medium, high]:
+            information = {
+                "Query": f"Patients with {levels[index]} risk score",
+                "Stroke Risk Level": f"{levels[index]}",
+                "Count": len(group),
+                "Percentage": round((len(group) / len(data)) * 100, 2)
+            }
+            index += 1
+            result.append(information)
+        return result
+    except Exception as e:
+        print(f"Error in Query xi (group patients into stroke risk scores): {e}")
+        return []
