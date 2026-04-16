@@ -310,7 +310,7 @@ def query_dietary_habits(data):
         return [stroke_dict, no_stroke_dict]
 
     except Exception as e:
-        print("Error in Query vi (dietary: stroke vs no stroke): {e}")
+        print(f"Error in Query vi (dietary: stroke vs no stroke): {e}")
         return []
 
 # ----------------------------------------------------------------
@@ -331,7 +331,7 @@ def query_hypertension_results_in_stroke(data):
                 result.append(row)
         return result
     except Exception as e:
-        print("Error in Query vii (hypertension and stroke): {e}")
+        print(f"Error in Query vii (hypertension and stroke): {e}")
         return []
 
 # ----------------------------------------------------------------
@@ -352,7 +352,7 @@ def query_heart_diseases_and_stroke(data):
                 result.append(row)
         return result
     except Exception as e:
-        print("Error in Query viii (heart diseases and stroke): {e}")
+        print(f"Error in Query viii (heart diseases and stroke): {e}")
         return []
 
 # ----------------------------------------------------------------
@@ -381,5 +381,86 @@ def query_average_sleep_hours(data):
         }
         return [sleep_avg_stroke, sleep_avg_no_stroke]
     except Exception as e:
-        print("Error in Query ix (average sleep hours): {e}")
+        print(f"Error in Query ix (average sleep hours): {e}")
+        return []
+
+# ----------------------------------------------------------------
+# x. Average sleep hours of patients with and without stroke
+# ----------------------------------------------------------------
+def query_filter_patients_by_criteria(data, minAge=None, maxAge=None, gender=None, hypertension=None, 
+                                        heartDisease=None, everMarried=None, worktype=None, 
+                                        residenceType=None, minAverageGlucoseLevel=None, 
+                                        maxAverageGlucoseLevel=None, minBMI=None, maxBMI=None, 
+                                        smokingStatus=None, physicalActivity=None, 
+                                        dietaryHabits=None, alcoholConsumption=None, 
+                                        chronicStress=None, minSleepHours=None, 
+                                        maxSleepHours=None, familyHistoryOfStroke=None, 
+                                        educationLevel=None, incomeLevel=None, minStrokeRiskScore=None, 
+                                        maxStrokeRiskScore=None, region=None, strokeOccurrence=None):
+    """
+    Return patients with given criteria
+    """
+    try:
+        # get keys
+        if not data:
+            return []
+        keys = list(data[0].keys())
+        # set string for each parameter
+        params = {keys[2]: gender, keys[3]: hypertension, keys[4]: heartDisease, keys[5]: everMarried, 
+                    keys[6]: worktype, keys[7]: residenceType, keys[10]: smokingStatus, 
+                    keys[11]: physicalActivity, keys[12]: dietaryHabits, keys[13]: alcoholConsumption, 
+                    keys[14]: chronicStress, keys[16]: familyHistoryOfStroke, keys[17]: educationLevel, 
+                    keys[18]: incomeLevel, keys[20]: region, keys[21]: strokeOccurrence}
+        result = []
+        for row in data:
+            # go through all min/max possible values
+            # min age
+            if minAge is not None and row.get("Age") < minAge:
+                    continue
+            # max age
+            if maxAge is not None and row.get("Age") > maxAge:
+                    continue
+            # min glucose level
+            if minAverageGlucoseLevel is not None and row.get("Average Glucose Level") < minAverageGlucoseLevel:
+                    continue
+            # max glucose level
+            if maxAverageGlucoseLevel is not None and row.get("Average Glucose Level") > maxAverageGlucoseLevel:
+                    continue
+            # min sleep hours
+            if minSleepHours is not None and row.get("Sleep Hours") < minSleepHours:
+                    continue
+            # max sleep hours
+            if maxSleepHours is not None and row.get("Sleep Hours") > maxSleepHours:
+                    continue
+            # min bmi
+            if minBMI is not None and row.get("BMI") < minBMI:
+                    continue
+            # max bmi
+            if maxBMI is not None and row.get("BMI") > maxBMI:
+                    continue
+            # min StrokeRiskScore
+            if minStrokeRiskScore is not None and row.get("Stroke Risk Score") < minStrokeRiskScore:
+                    continue
+            # max StrokeRiskScore
+            if maxStrokeRiskScore is not None and row.get("Stroke Risk Score") > maxStrokeRiskScore:
+                    continue
+            # go through all other values (no min/max)
+            relevant = True
+            for key, value in params.items():
+                # check if parameter is set
+                if value is not None:
+                    # check if the set parameter is correct
+                    if row.get(key) != value:
+                        # parameter is set but not relevant/correct
+                        relevant = False
+                        break
+
+            # add the patient to the result list because it's relevant
+            if relevant:
+                result.append(row)
+        
+        return result        
+
+    except Exception as e:
+        print(f"Error in Query x (feature extraction): {e}")
         return []
