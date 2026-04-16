@@ -387,16 +387,16 @@ def query_average_sleep_hours(data):
 # ----------------------------------------------------------------
 # x. Average sleep hours of patients with and without stroke
 # ----------------------------------------------------------------
-def query_filter_patients_by_criteria(data, minAge=None, maxAge=None, gender=None, hypertension=None, 
+def query_filter_patients_by_criteria(data, age=None, minAge=None, maxAge=None, gender=None, hypertension=None, 
                                         heartDisease=None, everMarried=None, worktype=None, 
-                                        residenceType=None, minAverageGlucoseLevel=None, 
-                                        maxAverageGlucoseLevel=None, minBMI=None, maxBMI=None, 
+                                        residenceType=None, averageGlucoseLevel=None, minAverageGlucoseLevel=None, 
+                                        maxAverageGlucoseLevel=None, bmi=None, minBMI=None, maxBMI=None, 
                                         smokingStatus=None, physicalActivity=None, 
                                         dietaryHabits=None, alcoholConsumption=None, 
-                                        chronicStress=None, minSleepHours=None, 
+                                        chronicStress=None, minSleepHours=None, sleepHours=None, 
                                         maxSleepHours=None, familyHistoryOfStroke=None, 
-                                        educationLevel=None, incomeLevel=None, minStrokeRiskScore=None, 
-                                        maxStrokeRiskScore=None, region=None, strokeOccurrence=None):
+                                        educationLevel=None, incomeLevel=None, strokeRiskScore=None, 
+                                        minStrokeRiskScore=None, maxStrokeRiskScore=None, region=None, strokeOccurrence=None):
     """
     Return patients with given criteria
     """
@@ -406,11 +406,12 @@ def query_filter_patients_by_criteria(data, minAge=None, maxAge=None, gender=Non
             return []
         keys = list(data[0].keys())
         # set string for each parameter
-        params = {keys[2]: gender, keys[3]: hypertension, keys[4]: heartDisease, keys[5]: everMarried, 
-                    keys[6]: worktype, keys[7]: residenceType, keys[10]: smokingStatus, 
-                    keys[11]: physicalActivity, keys[12]: dietaryHabits, keys[13]: alcoholConsumption, 
-                    keys[14]: chronicStress, keys[16]: familyHistoryOfStroke, keys[17]: educationLevel, 
-                    keys[18]: incomeLevel, keys[20]: region, keys[21]: strokeOccurrence}
+        params = {keys[1]: age, keys[2]: gender, keys[3]: hypertension, keys[4]: heartDisease, keys[5]: everMarried, 
+                    keys[6]: worktype, keys[7]: residenceType, keys[8]: averageGlucoseLevel, keys[9]: bmi, 
+                    keys[10]: smokingStatus, keys[11]: physicalActivity, keys[12]: dietaryHabits, 
+                    keys[13]: alcoholConsumption, keys[14]: chronicStress, keys[15]: sleepHours, 
+                    keys[16]: familyHistoryOfStroke, keys[17]: educationLevel, keys[18]: incomeLevel, 
+                    keys[19]: strokeRiskScore, keys[20]: region, keys[21]: strokeOccurrence}
         result = []
         for row in data:
             # go through all min/max possible values

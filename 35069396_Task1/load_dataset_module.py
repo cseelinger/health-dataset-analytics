@@ -26,8 +26,6 @@ class LoadDataset:
     def __init__(self, filepath):
         self.filepath = filepath
         self.dataset = []
-        # directly load dataset
-        self.load_dataset()
 
     def load_dataset(self):
         """
