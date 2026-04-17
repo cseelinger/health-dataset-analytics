@@ -1,3 +1,15 @@
+"""
+This module should implement functions for statistical analysis of the dataset features. 
+The statistical functions should include the following: 
+mean, mode, median, standard deviation, minimum, maximum, variance, and range. 
+These functions will be used by other modules to compute statistics for different patient groups.
+Additionally, implement a function that returns descriptive statistics for any specified numeric feature 
+of the dataset. This function should accept a feature name as a parameter 
+and return all relevant statistics (mean, median, mode, standard deviation, minimum, maximum, variance, range) 
+for that feature.
+
+"""
+
 class StatisticsModule:
     """
     Class to perform statistical analyses on the patient dataset

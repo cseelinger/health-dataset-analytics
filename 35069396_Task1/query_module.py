@@ -1,3 +1,8 @@
+"""
+the query_module that contains several functions for querying the loaded dataset 
+for various information and insights. 
+"""
+
 import csv
 from statistics_module import StatisticsModule
 
