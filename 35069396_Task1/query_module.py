@@ -505,3 +505,60 @@ def query_group_patients_stroke_risk(data):
     except Exception as e:
         print(f"Error in Query xi (group patients into stroke risk scores): {e}")
         return []
+
+# ----------------------------------------------------------------
+# xii. Get a patient summary for each region
+# ----------------------------------------------------------------
+def query_summary_report_for_region(data):
+    """
+    Generate a summary report comparing health statistics across different regions (North, South, East, West), 
+    including average age, average BMI, average glucose level, and stroke occurrence rate for each region.
+    """
+    def get_average_of_feature(patients, feature):
+        """
+        Small funktion to calculate the average of a feature
+        """
+        feature_list = []
+        for patient in patients:
+            feature_list.append(patient.get(feature))
+        if not feature_list:
+            return None
+        return round(StatisticsModule.calculate_mean(feature_list), 2)
+
+    try:
+        # calculate region groups
+        north = []
+        south = []
+        east = []
+        west = []
+        # sort patients into groups
+        for row in data:
+            region = row.get("Region")
+            if region == "North":
+                north.append(row)
+            elif region == "South":
+                south.append(row)
+            elif region == "East":
+                east.append(row)
+            elif region == "West":
+                west.append(row)
+        # store all information
+        result = []
+        regions = ["North", "South", "East", "West"]
+        index = 0
+        for group in [north, south, east, west]:
+            information = {
+                "Query": f"Patients living in region {regions[index]}.",
+                "Region": f"{regions[index]}",
+                "Count": len(group),
+                "Average Age": get_average_of_feature(group, "Age"),
+                "Average BMI": get_average_of_feature(group, "BMI"),
+                "Average Glucose Level": get_average_of_feature(group, "Average Glucose Level"),
+                "Stroke Occurrence Rate": get_average_of_feature(group, "Stroke Occurrence") * 100 # in percent
+            }
+            index += 1
+            result.append(information)
+        return result
+    except Exception as e:
+        print(f"Error in Query xii (summary of patients from specific regions): {e}")
+        return []
