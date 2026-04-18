@@ -14,6 +14,5 @@ def main():
     interface = UserInterface(data)
     interface.start_interface()
 
-
 if __name__ == "__main__":
     main()

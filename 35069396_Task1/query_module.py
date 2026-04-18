@@ -10,25 +10,27 @@ class QueryModule:
     def __init__(self, data):
         self.dataset = data
 
-    def export_to_csv(self, filename):
+    def export_to_csv(self, data, filename):
         """
         Save the result of a query (list of dictionaries) in a csv file
         """
-        if not self.dataset:
+        if not data:
             print(f"No data available for export in '{filename}'.")
             return False
         
         try:
-            headers = list(self.dataset[0].keys())
+            headers = list(data[0].keys())
             with open(filename, 'w') as f:
                 writer = csv.writer(f)
                 # column names
                 writer.writerow(headers)
                 # go through rows
-                for row in self.dataset:
+                for row in data:
+                    values = []
                     # write every cell (go through headers)
                     for column in headers:
-                        writer.writerow([row.get(column)])
+                        values.append(row.get(column))
+                    writer.writerow(values)
             return True
         except Exception as e:
             print(f"Error while exporting to CSV: {e}")
@@ -50,7 +52,7 @@ class QueryModule:
                 hypertension = row.get('Hypertension')
 
                 # it is a smoking person with hypertension
-                if hypertension == 1 and (smoke_status == 'Smokes' or smoke_status == 'Formerly smokes'):
+                if hypertension == 1 and (smoke_status == 'Smokes' or smoke_status == 'Formerly smoked'):
                     age = row.get('Age')
                     # add age to ages list
                     ages.append(age)
@@ -59,7 +61,6 @@ class QueryModule:
             
             # 2. Statistics (uses statistics_module)
             all_stats = {
-                "Query": "Smokers (or Former Smokers) with Hypertension",
                 "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                 "Median Age": round(StatisticsModule.calculate_median(ages), 2),
                 "Modal Age": StatisticsModule.calculate_mode(ages)
@@ -95,12 +96,11 @@ class QueryModule:
                         ages.append(age)
                     if type(glucose) == int or type(glucose) == float:
                         glucoses.append(glucose)
-            if not ages and not glucoses:
+            if not ages or not glucoses:
                 return [{"Message": "No suitable patients found."}]
             
             # 2. Statistics (uses statistics_module)
             all_stats = {
-                "Query": "Patients with Heart Diseases",
                 "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                 "Median Age": round(StatisticsModule.calculate_median(ages), 2),
                 "Modal Age": StatisticsModule.calculate_mode(ages),
@@ -114,7 +114,7 @@ class QueryModule:
 
     # ----------------------------------------------------------------
     # iii. Patients with hypertension
-    #      Comparing patients with heart attacks with patients without,
+    #      Comparing patients with stroke occurrence and without,
     #      Grouped by gender
     # ----------------------------------------------------------------
     def query_hypertension_stroke_by_gender(self):
@@ -128,40 +128,38 @@ class QueryModule:
             collected_data = {}
             for row in self.dataset:
                 # get necessary self.dataset
-                hypertension = row.get('Hypertension')
-                stroke = row.get('Stroke Occurrence')
+                hypertension = int(row.get('Hypertension'))
+                stroke = int(row.get('Stroke Occurrence'))
                 gender = row.get('Gender')
                 age = row.get('Age')
 
                 # only include patients with hypertension
                 if hypertension == 1:
-                    if type(age) == int:
-                        # add new gender group (e.g. "Other") if not already in dict
-                        if gender not in collected_data:
-                            collected_data[gender] = {
-                                "Stroke":    [], # with stroke
-                                "No Stroke": []  # without stroke
-                            }
-                        stroke_store_name = "Stroke" if stroke else "No Stroke"
-                        # store age in correct gender/stroke combination
-                        collected_data[gender][stroke_store_name].append(age)
+                    # add new gender group (e.g. "Other") if not already in dict
+                    if gender not in collected_data:
+                        collected_data[gender] = {
+                            "Stroke":    [], # with stroke
+                            "No Stroke": []  # without stroke
+                        }
+                    stroke_store_name = "Stroke" if stroke == 1 else "No Stroke"
+                    # store age in correct gender/stroke combination
+                    collected_data[gender][stroke_store_name].append(age)
             
             # 3. Get all information for the result from collected_data
-            all_info = {}
+            all_info = []
             for gender, stroke_groups in collected_data.items():
                 for stroke_status, ages in stroke_groups.items():
                     if ages:
-                        all_info = {
-                            "Query": "Hypertension by Gender and Stroke Status",
+                        all_info.append({
                             "Gender": gender,
                             "Stroke Occurrence": "Yes" if stroke_status == "Stroke" else "No",
                             "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                             "Median Age": round(StatisticsModule.calculate_median(ages), 2),
                             "Modal Age": StatisticsModule.calculate_mode(ages)
-                        }
+                        })
 
             # build result
-            return [all_info]
+            return all_info
 
         except Exception as e:
             print(f"Error in Query iii (hypertension stroke by gender): {e}")
@@ -203,19 +201,18 @@ class QueryModule:
                     activities_values[activity]["stroke_risk"].append(stroke_risk)
 
             # build result dict
-            averages = {}
+            averages = []
 
             for level, values in activities_values.items():
                 if values["bmi"] and values["glucose"] and values["stroke_risk"]:
-                    averages = {
-                                "Query": "Average values for activity level",
+                    averages.append({
                                 "Physical Activity": level,
                                 "Average BMI": round(StatisticsModule.calculate_mean(values["bmi"]), 2),
                                 "Average Glucose Level": round(StatisticsModule.calculate_mean(values["glucose"]), 2),
                                 "Average Stroke Risk Score": round(StatisticsModule.calculate_mean(values["stroke_risk"]), 2)
-                            }
+                            })
             # build result
-            return [averages]
+            return averages
 
         except Exception as e:
             print(f"Error in Query iv (averages physical activity level): {e}")
@@ -253,7 +250,6 @@ class QueryModule:
             urban_dict = {}
             # rural
             rural_dict = {
-                        "Query": "Average values for Rural stroke patients",
                         "Residence Type": "Rural",
                         "Average Age": round(StatisticsModule.calculate_mean(ages_rural), 2),
                         "Modal Age": StatisticsModule.calculate_mode(ages_rural),
@@ -261,7 +257,6 @@ class QueryModule:
                     }
             # urban
             urban_dict = {
-                        "Query": "Average values for Urban stroke patients",
                         "Residence Type": "Urban",
                         "Average Age": round(StatisticsModule.calculate_mean(ages_urban), 2),
                         "Modal Age": StatisticsModule.calculate_mode(ages_urban),
@@ -305,11 +300,9 @@ class QueryModule:
                     dietary_no_stroke.append(habit)
 
             stroke_dict = {
-                "Query": "Stroke vs no stroke: Dietary Habits",
                 "Stroke Occurrence": "Yes"
             }
             no_stroke_dict = {
-                "Query": "Stroke vs no stroke: Dietary Habits",
                 "Stroke Occurrence": "No"
             }
             # add all habits for stroke and no stroke to the dict
@@ -356,7 +349,7 @@ class QueryModule:
             result = []
             for row in self.dataset:
                 # get information
-                heart_disease = row.get("Heart Diseases")
+                heart_disease = row.get("Heart Disease")
                 stroke = row.get("Stroke Occurrence")
                 # only add patient to list if they have heart disease and stroke
                 if heart_disease == 1 and stroke == 1:
@@ -383,11 +376,11 @@ class QueryModule:
                 if stroke == 0:
                     sleep_no_stroke.append(row.get("Sleep Hours"))
             sleep_avg_stroke = {
-                "Query": "Average sleep hours of patients with stroke",
+                "Stroke Occurrence": "Yes",
                 "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_stroke), 2)
             }
             sleep_avg_no_stroke = {
-                "Query": "Average sleep hours of patients with stroke",
+                "Stroke Occurrence": "No",
                 "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_no_stroke), 2)
             }
             return [sleep_avg_stroke, sleep_avg_no_stroke]
@@ -495,7 +488,7 @@ class QueryModule:
                 stroke_risk_score = row.get("Stroke Risk Score")
                 if stroke_risk_score < 34:
                     low.append(row)
-                if stroke_risk_score > 66:
+                elif stroke_risk_score > 66:
                     high.append(row)
                 else:
                     medium.append(row)
@@ -505,7 +498,6 @@ class QueryModule:
             index = 0
             for group in [low, medium, high]:
                 information = {
-                    "Query": f"Patients with {levels[index]} risk score",
                     "Stroke Risk Level": f"{levels[index]}",
                     "Count": len(group),
                     "Percentage": round((len(group) / len(self.dataset)) * 100, 2)
@@ -559,7 +551,6 @@ class QueryModule:
             index = 0
             for group in [north, south, east, west]:
                 information = {
-                    "Query": f"Patients living in region {regions[index]}.",
                     "Region": f"{regions[index]}",
                     "Count": len(group),
                     "Average Age": get_average_of_feature(group, "Age"),

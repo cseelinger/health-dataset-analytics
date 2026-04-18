@@ -27,10 +27,14 @@ class StatisticsModule:
 
     @staticmethod
     def calculate_mean(values):
+        if not values:
+            return None
         return sum(values) / len(values)
 
     @staticmethod
     def calculate_median(values):
+        if not values:
+            return None
         # first sort values
         sorted_values = sorted(values)
         n = len(sorted_values)
@@ -44,6 +48,8 @@ class StatisticsModule:
 
     @staticmethod
     def calculate_mode(values):
+        if not values:
+            return None
         counts = {}
         # count every value and store the count in the dict
         for val in values:
@@ -61,6 +67,8 @@ class StatisticsModule:
     
     @staticmethod
     def calculate_variance(values):
+        if not values:
+            return None
         """
         variance:
         [ 1 / (n - 1) ] * sum( (x - mean(x))² )
@@ -78,6 +86,8 @@ class StatisticsModule:
     
     @staticmethod
     def calculate_standard_deviation(values):
+        if not values:
+            return None
         """
         standard deviation:
         square_root(variance)
@@ -90,14 +100,20 @@ class StatisticsModule:
 
     @staticmethod
     def calculate_min(values):
+        if not values:
+            return None
         return min(values)
 
     @staticmethod
     def calculate_max(values):
+        if not values:
+            return None
         return max(values)
 
     @staticmethod
     def calculate_range(values):
+        if not values:
+            return None
         return max(values) - min(values)
 
     def get_descriptive_statistics_for_feature(self, feature):
@@ -131,7 +147,7 @@ class StatisticsModule:
             # 4. store them in a dictionary
             statistics = {
                 "Feature": feature,
-                "Count (valid values)": len(values),
+                "Count": len(values),
                 "Mean": mean,
                 "Median": median,
                 "Mode": mode,
