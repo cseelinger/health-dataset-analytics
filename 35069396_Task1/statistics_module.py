@@ -51,7 +51,7 @@ class StatisticsModule:
         counts = {}
         # count every value and store the count in the dict
         for val in values:
-            counts[val] = counts.get(val) + 1
+            counts[val] = counts.get(val, 0) + 1
         # start with first value
         max_val = values[0]
         max_count = 1
@@ -127,10 +127,6 @@ class StatisticsModule:
             if type(val) == int or type(val) == float:
                 values.append(val)
 
-        # we didn't find any numeric values
-        if not values:
-            raise ValueError(f"No numerical data for the feature '{feature}' found.")
-
         # clculate statistics 
         mean = round(self.calculate_mean(values), 2)
         median = round(self.calculate_median(values), 2)
@@ -154,4 +150,5 @@ class StatisticsModule:
             "Maximum": maximum,
             "Range": rangee
         }
+
         return statistics
