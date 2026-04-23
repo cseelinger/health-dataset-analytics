@@ -19,14 +19,14 @@ class QueryModule:
             return False
         
         headers = list(data[0].keys())
-        with open(filename, 'w') as f:
-            export_data = csv.writer(f)
+        with open(filename, 'w', newline='') as output_file:
+            export_data = csv.writer(output_file)
             # column names
             export_data.writerow(headers)
             # go through rows
             for row in data:
                 values = []
-                # write every cell (go through headers)
+                # go through headers to store into list
                 for column in headers:
                     values.append(row.get(column))
                 export_data.writerow(values)

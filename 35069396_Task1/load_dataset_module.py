@@ -41,8 +41,8 @@ class LoadDataset:
         """
         Read and parse the dataset csv file and store it directly in self.dataset
         """
-        with open(self.filepath, 'r') as f:
-            loaded_data = csv.reader(f)
+        with open(self.filepath, 'r') as input_file:
+            loaded_data = csv.reader(input_file)
             # get header from first row
             try:
                 headers = next(loaded_data)

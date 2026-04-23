@@ -1,3 +1,17 @@
+"""
+Module that produces a user interface. Usage of tkinter. The user interface provides the 
+functionality for querying the system for any query in query_module and 
+displaying the results. The queries and displayed results are user-friendly.
+The interface should include:
+i.	 A menu or selection system allowing users to choose which query or analysis to perform.
+ii.	 Input fields where necessary (e.g., for entering age ranges, selecting regions, or choosing 
+     filter criteria).
+iii. A results display area that presents the output in a clear, readable format.
+iv.	 An option to export query results to a CSV file.
+v.	 The ability to view descriptive statistics for any selected feature.
+vi.	 The option for users to continue using the system or quit when they are done.
+"""
+
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
@@ -14,10 +28,12 @@ class UserInterface:
         self.last_right_result = []
 
     def start_interface(self):
+        """
+        Initialize tkinter Interface
+        """
         self.root = tk.Tk()
         self.root.title("Patient Health Analytics System")
         self.root.geometry("1000x600")
-        self.root.resizable(False, False)
 
         # main canvas + vertical scrollbar
         self.main_canvas = tk.Canvas(self.root)
@@ -29,7 +45,6 @@ class UserInterface:
 
         # frame inside canvas
         self.content_frame = tk.Frame(self.main_canvas)
-
         self.main_canvas.create_window((0, 0), window=self.content_frame, anchor="nw")
 
         # update scroll region whenever content changes
@@ -57,6 +72,10 @@ class UserInterface:
         self.root.mainloop()
 
     def build_variables_for_filter_criteria(self):
+        """
+        Build every line to build input fields for the filter criteria method
+        -> For every feature can be inserted or selected a value
+        """
         # age
         self.age_label = tk.Label(self.filter_frame, text="Exact Age:")
         self.age_entry = tk.Entry(self.filter_frame)
@@ -403,6 +422,9 @@ class UserInterface:
         self.filter_frame.pack_forget()
     
     def build_left_side(self):
+        """
+        Build everything placed/written on the left side of the window
+        """
         # heading
         self.left_title = tk.Label(
             self.left_frame,
@@ -415,7 +437,7 @@ class UserInterface:
         self.left_var = tk.StringVar()
         self.left_var.set("Please choose")
 
-        self.left_options = [
+        self.query_descriptions = [
             "Smokers with Hypertension",
             "Patients with Heart Disease",
             "Patients with Hypertension, with/without Stroke, sort by Gender",
@@ -433,7 +455,7 @@ class UserInterface:
         self.left_menu = tk.OptionMenu(
             self.left_frame,
             self.left_var,
-            *self.left_options,
+            *self.query_descriptions,
             command=self.show_selections_for_filter_patients_criteria
         )
         self.left_menu.pack(anchor="w", fill="x")
@@ -464,6 +486,9 @@ class UserInterface:
         self.left_export_button.pack(anchor="w", pady=(10, 0))
 
     def build_right_side(self):
+        """
+        Build everything placed/written on the right side of the window
+        """
         # heading
         self.right_title = tk.Label(
             self.right_frame,
@@ -495,7 +520,7 @@ class UserInterface:
         self.right_run_button = tk.Button(
             self.right_frame,
             text="Run",
-            command=self.descriptive_statistics
+            command=self.run_descriptive_statistics
         )
         self.right_run_button.pack(anchor="w", pady=(10, 10))
 
@@ -512,23 +537,35 @@ class UserInterface:
         self.right_export_button.pack(anchor="w", pady=(10, 0))
     
     def get_int_or_none(self, integer):
+        """
+        Return int if parsable into int
+        """
         value = integer.get().strip()
         if value == "":
             return None
         return int(value)
     
     def get_float_or_none(self, number):
+        """
+        Return float if parsable into float
+        """
         value = number.get().strip()
         if value == "":
             return None
         return float(value)
 
     def get_string_or_none(self, value):
+        """
+        Return None if nothing is written in the field
+        """
         if value == "":
             return None
         return value
 
     def get_bool_or_none(self, value):
+        """
+        Convert Yes/No into booleans
+        """
         if value == "Yes":
             return 1
         elif value == "No":
@@ -536,12 +573,20 @@ class UserInterface:
         return None
 
     def show_selections_for_filter_patients_criteria(self, selected_value):
+        """
+        Enable the view of values which can be selected/inserted 
+        for the query "query_filter_patients_by_criteria".
+        If this query is not selected, don't show these fields.
+        """
         if selected_value == "Filter patients by following criteria:":
             self.filter_frame.pack(anchor="w", fill="x", pady=(10, 10), before=self.left_result_text)
         else:
             self.filter_frame.pack_forget()
     
     def run_query(self):
+        """
+        Run the query selected in the drop down menu.
+        """
         selection = self.left_var.get()
 
         if selection == "Smokers with Hypertension":
@@ -633,16 +678,25 @@ class UserInterface:
         elif selection == "Patient summary for each region of living":
             result = self.queries.query_summary_report_for_region()
         else:
+            messagebox.showwarning(title="WARNING", message="No query is chosen.")
+            return
+        
+        if not result:
+            messagebox.showwarning(title="WARNING", message="No data could be calculated.")
             return
 
         self.last_left_result = result
         self.show_result(self.left_result_text, result)
         self.left_export_button.config(state=tk.NORMAL)
 
-    def descriptive_statistics(self):
+    def run_descriptive_statistics(self):
+        """
+        Run the descriptive statistics method from the statistics module.
+        """
         selection = self.right_var.get()
 
         if selection == "Please choose":
+            messagebox.showwarning(title="WARNING", message="No feature is chosen.")
             return
 
         result = self.statistics.get_descriptive_statistics_for_feature(selection)
@@ -656,6 +710,9 @@ class UserInterface:
         self.right_export_button.config(state=tk.NORMAL)
 
     def show_result(self, text_widget, result):
+        """
+        Display result under the drop down menu, calculated by the query module.
+        """
         text_widget.delete("1.0", tk.END)
 
         if not result:
@@ -680,7 +737,11 @@ class UserInterface:
         text_widget.insert(tk.END, str(result))
 
     def export_left_result(self):
+        """
+        Export the result of a query to a csv file.
+        """
         if not self.last_left_result:
+            messagebox.showwarning(title="WARNING", message="No result available for export.")
             return
 
         filename = filedialog.asksaveasfilename(
@@ -694,11 +755,14 @@ class UserInterface:
         success = self.queries.export_to_csv(self.last_left_result, filename)
 
         if success:
-            messagebox.showinfo("SUCCESS: Result exported successfully.")
+            messagebox.showinfo(title="SUCCESS", message="Result exported successfully.")
 
     def export_right_result(self):
+        """
+        Export the result of the descriptive statistics to a csv file.
+        """
         if not self.last_right_result:
-            messagebox.showwarning("WARNING: No result available for export.")
+            messagebox.showwarning(title="WARNING", message="No result available for export.")
             return
 
         filename = filedialog.asksaveasfilename(
@@ -712,7 +776,7 @@ class UserInterface:
         success = self.queries.export_to_csv(self.last_right_result, filename)
 
         if success:
-            messagebox.showinfo("SUCCESS: Result exported successfully.")
+            messagebox.showinfo(title="SUCCESS", message="Result exported successfully.")
         else:
-            messagebox.showerror("ERROR: Export failed.")
+            messagebox.showerror(title="ERROR", message="Export failed.")
 
