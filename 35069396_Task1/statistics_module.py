@@ -51,10 +51,10 @@ class StatisticsModule:
         counts = {}
         # count every value and store the count in the dict
         for val in values:
-            counts[val] = counts.get(val, 0) + 1
+            counts[val] = counts.get(val) + 1
         # start with first value
         max_val = values[0]
-        max_count = 0
+        max_count = 1
         for val, count in counts.items():
             # if current value has higher count than last stored
             if count > max_count:
@@ -119,47 +119,39 @@ class StatisticsModule:
         Takes a column name as input and calculates all relevant statistics.
         Returns a dictionary containing the results.
         """
-        try:
-            # 1. Extract all valid (non-null and numeric) values from the column
-            values = []
-            for row in self.dataset:
-                val = row.get(feature)
-                # Check whether the value is a number (int or float)
-                if type(val) == int or type(val) == float:
-                    values.append(val)
+        # extract all valid (non-null and numeric) values from the column
+        values = []
+        for row in self.dataset:
+            val = row.get(feature)
+            # Check whether the value is a number (int or float)
+            if type(val) == int or type(val) == float:
+                values.append(val)
 
-            # 2. Check whether we have found any figures that can be analysed at all
-            if not values:
-                raise ValueError(f"No numerical data for the feature '{feature}' found.")
+        # we didn't find any numeric values
+        if not values:
+            raise ValueError(f"No numerical data for the feature '{feature}' found.")
 
-            # 3. Calculate statistics 
-            mean = round(self.calculate_mean(values), 2)
-            median = round(self.calculate_median(values), 2)
-            mode = self.calculate_mode(values)
-            standard_deviation = round(self.calculate_standard_deviation(values), 2)
-            variance = round(self.calculate_variance(values), 2)
-            minimum = self.calculate_min(values)
-            maximum = self.calculate_max(values)
-            rangee = self.calculate_range(values)
+        # clculate statistics 
+        mean = round(self.calculate_mean(values), 2)
+        median = round(self.calculate_median(values), 2)
+        mode = self.calculate_mode(values)
+        standard_deviation = round(self.calculate_standard_deviation(values), 2)
+        variance = round(self.calculate_variance(values), 2)
+        minimum = self.calculate_min(values)
+        maximum = self.calculate_max(values)
+        rangee = self.calculate_range(values)
 
-            # 4. store them in a dictionary
-            statistics = {
-                "Feature": feature,
-                "Count": len(values),
-                "Mean": mean,
-                "Median": median,
-                "Mode": mode,
-                "Standard Deviation": standard_deviation,
-                "Variance": variance,
-                "Minimum": minimum,
-                "Maximum": maximum,
-                "Range": rangee
-            }
-            return statistics
-
-        except ValueError as e:
-            print(f"ERROR in {feature}: {e}")
-            return None
-        except Exception as e:
-            print(f"An unexpected ERROR has occurred: {e}")
-            return None
+        # 4. store them in a dictionary
+        statistics = {
+            "Feature": feature,
+            "Count": len(values),
+            "Mean": mean,
+            "Median": median,
+            "Mode": mode,
+            "Standard Deviation": standard_deviation,
+            "Variance": variance,
+            "Minimum": minimum,
+            "Maximum": maximum,
+            "Range": rangee
+        }
+        return statistics

@@ -41,46 +41,38 @@ class LoadDataset:
         """
         Read and parse the dataset csv file and store it directly in self.dataset
         """
-        try:
-            with open(self.filepath, 'r') as f:
-                loaded_data = csv.reader(f)
-                # get header from first row
-                try:
-                    headers = next(loaded_data)
-                except Exception:
-                    print("ERROR: The file is empty.")
-                    return None
+        with open(self.filepath, 'r') as f:
+            loaded_data = csv.reader(f)
+            # get header from first row
+            try:
+                headers = next(loaded_data)
+            except Exception:
+                print("ERROR: The file is empty.")
+                return None
 
-                row_number = 1
-                # go through all rows of the file
-                for row in loaded_data:
-                    row_number += 1
-                    # new storage for the row
-                    new_row = {}
-                    # go through all columns and sort values to headers (key)
-                    for i in range(len(headers)):
-                        # get value just if there is content in this column
-                        if i < len(row):
-                            new_row[headers[i]] = row[i]
-                        else:
-                            # if there are columns with headers without content
-                            new_row[headers[i]] = ""
-                    try: 
-                        # turn missing values into None and number into int/float
-                        finished_row = self.process_one_row(new_row)
-                        self.dataset.append(finished_row)
-                    except Exception as e:
-                        print(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
-            
-            print(f"Successfully loaded patient data: {len(self.dataset)}")
-            return self.dataset
-
-        except FileNotFoundError:
-            print(f"ERROR: The File {self.filepath} was not found.")
-            return None
-        except Exception as e:
-            print(f"Unknown ERROR while loading the dataset: {e}")
-            return None
+            row_number = 1
+            # go through all rows of the file
+            for row in loaded_data:
+                row_number += 1
+                # new storage for the row
+                new_row = {}
+                # go through all columns and sort values to headers (key)
+                for i in range(len(headers)):
+                    # get value just if there is content in this column
+                    if i < len(row):
+                        new_row[headers[i]] = row[i]
+                    else:
+                        # if there are columns with headers without content
+                        new_row[headers[i]] = ""
+                try: 
+                    # turn missing values into None and number into int/float
+                    finished_row = self.process_one_row(new_row)
+                    self.dataset.append(finished_row)
+                except Exception as e:
+                    print(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
+        
+        print(f"Successfully loaded patient data: {len(self.dataset)}")
+        return self.dataset
 
     def get_missing_values(self, value):
         """

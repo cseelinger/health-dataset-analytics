@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from query_module import QueryModule
 from statistics_module import StatisticsModule
 
@@ -541,126 +542,118 @@ class UserInterface:
             self.filter_frame.pack_forget()
     
     def run_query(self):
-        try:
-            selection = self.left_var.get()
+        selection = self.left_var.get()
 
-            if selection == "Smokers with Hypertension":
-                result = self.queries.query_smokers_hypertension()
-            elif selection == "Patients with Heart Disease":
-                result = self.queries.query_heart_disease()
-            elif selection == "Patients with Hypertension, with/without Stroke, sort by Gender":
-                result = self.queries.query_hypertension_stroke_by_gender()
-            elif selection == "Average Values of Physical Activity Levels":
-                result = self.queries.query_averages_physical_activity_level()
-            elif selection == "Urban vs Rural: Average Values of Stroke Patients":
-                result = self.queries.query_urban_vs_rural_areas_with_stroke()
-            elif selection == "Stroke vs no Stroke: Dietary Habits":
-                result = self.queries.query_dietary_habits()
-            elif selection == "Patients whose Hypertension resulted in a Stroke":
-                result = self.queries.query_hypertension_results_in_stroke()
-            elif selection == "Patients with Heart Disease and Stroke":
-                result = self.queries.query_heart_diseases_and_stroke()
-            elif selection == "Average Sleep Hours of patients with and without Stroke":
-                result = self.queries.query_average_sleep_hours()
-            elif selection == "Filter patients by following criteria:":
-                # age
-                exact_age = self.get_int_or_none(self.age_entry)
-                min_age = self.get_int_or_none(self.min_age_entry)
-                max_age = self.get_int_or_none(self.max_age_entry)
-                # gender
-                gender = self.get_string_or_none(self.gender_var.get())
-                # hypertension
-                hypertension = self.get_bool_or_none(self.hypertension_var.get())
-                # heart disease
-                heart_disease = self.get_bool_or_none(self.heart_disease_var.get())
-                # ever married
-                ever_married = self.get_bool_or_none(self.ever_married_var.get())
-                # worktype
-                work_type = self.get_string_or_none(self.worktype_var.get())
-                # residence type
-                residence_type = self.get_string_or_none(self.residence_var.get())
-                # glucose exact
-                glucose = self.get_float_or_none(self.glucose_entry)
-                min_glucose = self.get_float_or_none(self.min_glucose_entry)
-                max_glucose = self.get_float_or_none(self.max_glucose_entry)
-                # bmi
-                bmi = self.get_float_or_none(self.bmi_entry)
-                min_bmi = self.get_float_or_none(self.min_bmi_entry)
-                max_bmi = self.get_float_or_none(self.max_bmi_entry)
-                # smoking status
-                smoking_status = self.get_string_or_none(self.smoking_var.get())
-                # physical activity
-                physical_act = self.get_string_or_none(self.physical_activity_var.get())
-                # dietary habits
-                dietary_habits = self.get_string_or_none(self.dietary_var.get())
-                # alcohol consumption
-                alcohol = self.get_bool_or_none(self.alcohol_var.get())
-                # chronic stress
-                chronic_stress = self.get_bool_or_none(self.stress_var.get())
-                # sleep hours
-                sleep_hours = self.get_int_or_none(self.sleep_entry)
-                min_sleep = self.get_int_or_none(self.min_sleep_entry)
-                max_sleep = self.get_int_or_none(self.max_sleep_entry)
-                # family stroke history
-                family_stroke = self.get_bool_or_none(self.family_var.get())
-                # education level
-                education_level = self.get_string_or_none(self.education_var.get())
-                # income level
-                income_level = self.get_string_or_none(self.income_var.get())
-                # stroke risk score
-                stroke_risk = self.get_int_or_none(self.stroke_risk_entry)
-                min_stroke = self.get_int_or_none(self.min_stroke_risk_entry)
-                max_stroke = self.get_int_or_none(self.max_stroke_risk_entry)
-                # region
-                region = self.get_string_or_none(self.region_var.get())
-                # stroke occurrence
-                stroke_occ = self.get_bool_or_none(self.stroke_occ_var.get())
+        if selection == "Smokers with Hypertension":
+            result = self.queries.query_smokers_hypertension()
+        elif selection == "Patients with Heart Disease":
+            result = self.queries.query_heart_disease()
+        elif selection == "Patients with Hypertension, with/without Stroke, sort by Gender":
+            result = self.queries.query_hypertension_stroke_by_gender()
+        elif selection == "Average Values of Physical Activity Levels":
+            result = self.queries.query_averages_physical_activity_level()
+        elif selection == "Urban vs Rural: Average Values of Stroke Patients":
+            result = self.queries.query_urban_vs_rural_areas_with_stroke()
+        elif selection == "Stroke vs no Stroke: Dietary Habits":
+            result = self.queries.query_dietary_habits()
+        elif selection == "Patients whose Hypertension resulted in a Stroke":
+            result = self.queries.query_hypertension_results_in_stroke()
+        elif selection == "Patients with Heart Disease and Stroke":
+            result = self.queries.query_heart_diseases_and_stroke()
+        elif selection == "Average Sleep Hours of patients with and without Stroke":
+            result = self.queries.query_average_sleep_hours()
+        elif selection == "Filter patients by following criteria:":
+            # age
+            exact_age = self.get_int_or_none(self.age_entry)
+            min_age = self.get_int_or_none(self.min_age_entry)
+            max_age = self.get_int_or_none(self.max_age_entry)
+            # gender
+            gender = self.get_string_or_none(self.gender_var.get())
+            # hypertension
+            hypertension = self.get_bool_or_none(self.hypertension_var.get())
+            # heart disease
+            heart_disease = self.get_bool_or_none(self.heart_disease_var.get())
+            # ever married
+            ever_married = self.get_bool_or_none(self.ever_married_var.get())
+            # worktype
+            work_type = self.get_string_or_none(self.worktype_var.get())
+            # residence type
+            residence_type = self.get_string_or_none(self.residence_var.get())
+            # glucose exact
+            glucose = self.get_float_or_none(self.glucose_entry)
+            min_glucose = self.get_float_or_none(self.min_glucose_entry)
+            max_glucose = self.get_float_or_none(self.max_glucose_entry)
+            # bmi
+            bmi = self.get_float_or_none(self.bmi_entry)
+            min_bmi = self.get_float_or_none(self.min_bmi_entry)
+            max_bmi = self.get_float_or_none(self.max_bmi_entry)
+            # smoking status
+            smoking_status = self.get_string_or_none(self.smoking_var.get())
+            # physical activity
+            physical_act = self.get_string_or_none(self.physical_activity_var.get())
+            # dietary habits
+            dietary_habits = self.get_string_or_none(self.dietary_var.get())
+            # alcohol consumption
+            alcohol = self.get_bool_or_none(self.alcohol_var.get())
+            # chronic stress
+            chronic_stress = self.get_bool_or_none(self.stress_var.get())
+            # sleep hours
+            sleep_hours = self.get_int_or_none(self.sleep_entry)
+            min_sleep = self.get_int_or_none(self.min_sleep_entry)
+            max_sleep = self.get_int_or_none(self.max_sleep_entry)
+            # family stroke history
+            family_stroke = self.get_bool_or_none(self.family_var.get())
+            # education level
+            education_level = self.get_string_or_none(self.education_var.get())
+            # income level
+            income_level = self.get_string_or_none(self.income_var.get())
+            # stroke risk score
+            stroke_risk = self.get_int_or_none(self.stroke_risk_entry)
+            min_stroke = self.get_int_or_none(self.min_stroke_risk_entry)
+            max_stroke = self.get_int_or_none(self.max_stroke_risk_entry)
+            # region
+            region = self.get_string_or_none(self.region_var.get())
+            # stroke occurrence
+            stroke_occ = self.get_bool_or_none(self.stroke_occ_var.get())
 
-                result = self.queries.query_filter_patients_by_criteria(
-                    age=exact_age, minAge=min_age, maxAge=max_age, gender=gender,
-                    hypertension=hypertension, heartDisease=heart_disease, everMarried=ever_married, 
-                    worktype=work_type, residenceType=residence_type, averageGlucoseLevel=glucose, 
-                    minAverageGlucoseLevel=min_glucose, maxAverageGlucoseLevel=max_glucose, bmi=bmi, 
-                    minBMI=min_bmi, maxBMI=max_bmi, smokingStatus=smoking_status, physicalActivity=physical_act, 
-                    dietaryHabits=dietary_habits, alcoholConsumption=alcohol, chronicStress=chronic_stress, 
-                    minSleepHours=min_sleep, sleepHours=sleep_hours, maxSleepHours=max_sleep, 
-                    familyHistoryOfStroke=family_stroke, educationLevel=education_level, incomeLevel=income_level, 
-                    strokeRiskScore=stroke_risk, minStrokeRiskScore=min_stroke, maxStrokeRiskScore=max_stroke, 
-                    region=region, strokeOccurrence=stroke_occ
-                )
-            elif selection == "Categorize patients into Stroke Risk Groups":
-                result = self.queries.query_group_patients_stroke_risk()
-            elif selection == "Patient summary for each region of living":
-                result = self.queries.query_summary_report_for_region()
-            else:
-                return
+            result = self.queries.query_filter_patients_by_criteria(
+                age=exact_age, minAge=min_age, maxAge=max_age, gender=gender,
+                hypertension=hypertension, heartDisease=heart_disease, everMarried=ever_married, 
+                worktype=work_type, residenceType=residence_type, averageGlucoseLevel=glucose, 
+                minAverageGlucoseLevel=min_glucose, maxAverageGlucoseLevel=max_glucose, bmi=bmi, 
+                minBMI=min_bmi, maxBMI=max_bmi, smokingStatus=smoking_status, physicalActivity=physical_act, 
+                dietaryHabits=dietary_habits, alcoholConsumption=alcohol, chronicStress=chronic_stress, 
+                minSleepHours=min_sleep, sleepHours=sleep_hours, maxSleepHours=max_sleep, 
+                familyHistoryOfStroke=family_stroke, educationLevel=education_level, incomeLevel=income_level, 
+                strokeRiskScore=stroke_risk, minStrokeRiskScore=min_stroke, maxStrokeRiskScore=max_stroke, 
+                region=region, strokeOccurrence=stroke_occ
+            )
+        elif selection == "Categorize patients into Stroke Risk Groups":
+            result = self.queries.query_group_patients_stroke_risk()
+        elif selection == "Patient summary for each region of living":
+            result = self.queries.query_summary_report_for_region()
+        else:
+            return
 
-            self.last_left_result = result
-            self.show_result(self.left_result_text, result)
-            self.left_export_button.config(state=tk.NORMAL)
-
-        except Exception as e:
-            print(f"ERROR: Could not run query: {e}")
+        self.last_left_result = result
+        self.show_result(self.left_result_text, result)
+        self.left_export_button.config(state=tk.NORMAL)
 
     def descriptive_statistics(self):
-        try:
-            selection = self.right_var.get()
+        selection = self.right_var.get()
 
-            if selection == "Please choose":
-                return
+        if selection == "Please choose":
+            return
 
-            result = self.statistics.get_descriptive_statistics_for_feature(selection)
+        result = self.statistics.get_descriptive_statistics_for_feature(selection)
 
-            if result is None:
-                self.last_right_result = []
-            else:
-                self.last_right_result = [result]
+        if result is None:
+            self.last_right_result = []
+        else:
+            self.last_right_result = [result]
 
-            self.show_result(self.right_result_text, result)
-            self.right_export_button.config(state=tk.NORMAL)
-
-        except Exception as e:
-            print(f"ERROR: Could not calculate statistics: {e}")
+        self.show_result(self.right_result_text, result)
+        self.right_export_button.config(state=tk.NORMAL)
 
     def show_result(self, text_widget, result):
         text_widget.delete("1.0", tk.END)
@@ -687,47 +680,39 @@ class UserInterface:
         text_widget.insert(tk.END, str(result))
 
     def export_left_result(self):
-        try:
-            if not self.last_left_result:
-                return
+        if not self.last_left_result:
+            return
 
-            filename = filedialog.asksaveasfilename(
-                defaultextension=".csv",
-                filetypes=[("CSV files", "*.csv")]
-            )
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")]
+        )
 
-            if not filename:
-                return
+        if not filename:
+            return
 
-            success = self.queries.export_to_csv(self.last_left_result, filename)
+        success = self.queries.export_to_csv(self.last_left_result, filename)
 
-            if success:
-                print("SUCCESS: Result exported successfully.")
-
-        except Exception as e:
-            print(f"ERROR: Could not export result:\n{e}")
+        if success:
+            messagebox.showinfo("SUCCESS: Result exported successfully.")
 
     def export_right_result(self):
-        try:
-            if not self.last_right_result:
-                print("WARNING: No right result available for export.")
-                return
+        if not self.last_right_result:
+            messagebox.showwarning("WARNING: No result available for export.")
+            return
 
-            filename = filedialog.asksaveasfilename(
-                defaultextension=".csv",
-                filetypes=[("CSV files", "*.csv")]
-            )
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".csv",
+            filetypes=[("CSV files", "*.csv")]
+        )
 
-            if not filename:
-                return
+        if not filename:
+            return
 
-            success = self.queries.export_to_csv(self.last_right_result, filename)
+        success = self.queries.export_to_csv(self.last_right_result, filename)
 
-            if success:
-                print("SUCCESS: Result exported successfully.")
-            else:
-                print("ERROR: Export failed.")
-
-        except Exception as e:
-            print(f"ERROR: Could not export result:\n{e}")
+        if success:
+            messagebox.showinfo("SUCCESS: Result exported successfully.")
+        else:
+            messagebox.showerror("ERROR: Export failed.")
 
