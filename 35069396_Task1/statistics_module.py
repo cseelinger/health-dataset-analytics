@@ -16,8 +16,6 @@ class StatisticsModule:
     """
     def __init__(self, dataset):
         # Initialize statistic module with the loaded data
-        if not dataset:
-            raise ValueError("Dataset is empty or invalid.")
         self.dataset = dataset
 
     # ---------------------------------------------

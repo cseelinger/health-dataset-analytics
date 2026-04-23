@@ -21,16 +21,16 @@ class QueryModule:
         try:
             headers = list(data[0].keys())
             with open(filename, 'w') as f:
-                writer = csv.writer(f)
+                export_data = csv.writer(f)
                 # column names
-                writer.writerow(headers)
+                export_data.writerow(headers)
                 # go through rows
                 for row in data:
                     values = []
                     # write every cell (go through headers)
                     for column in headers:
                         values.append(row.get(column))
-                    writer.writerow(values)
+                    export_data.writerow(values)
             return True
         except Exception as e:
             print(f"ERROR while exporting to CSV: {e}")
