@@ -8,7 +8,7 @@ from query_module import QueryModule
 from user_interface_module import UserInterface
 
 def main():
-    loader = LoadDataset("data_short.csv")
+    loader = LoadDataset("data.csv")
     data = loader.load_dataset()
     queries = QueryModule(data)
     interface = UserInterface(data)

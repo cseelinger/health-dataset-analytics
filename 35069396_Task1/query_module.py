@@ -1,5 +1,5 @@
 """
-the query_module that contains several functions for querying the loaded self.datasetset 
+Query_module that contains several functions for querying the loaded self.datasetset 
 for various information and insights. 
 """
 
@@ -33,7 +33,7 @@ class QueryModule:
                     writer.writerow(values)
             return True
         except Exception as e:
-            print(f"Error while exporting to CSV: {e}")
+            print(f"ERROR while exporting to CSV: {e}")
             return False
 
     # ----------------------------------------------------------------
@@ -45,6 +45,8 @@ class QueryModule:
         who smoke or have smoked AND have hypertension.
         """
         try:
+            if not self.dataset:
+                return []
             ages = []
             for row in self.dataset:
                 # check if hypertension and smoking
@@ -57,7 +59,7 @@ class QueryModule:
                     # add age to ages list
                     ages.append(age)
             if not ages:
-                return [{"Message": "No suitable patients found."}]
+                return []
             
             # 2. Statistics (uses statistics_module)
             all_stats = {
@@ -69,7 +71,7 @@ class QueryModule:
             return [all_stats]
 
         except Exception as e:
-            print(f"Error in Query i (smokers hypertension): {e}")
+            print(f"ERROR in Query i (smokers hypertension): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -81,6 +83,8 @@ class QueryModule:
         of patients who have heart disease.
         """
         try:
+            if not self.dataset:
+                return []
             # 1. filter data
             ages = []
             glucoses = []
@@ -97,7 +101,7 @@ class QueryModule:
                     if type(glucose) == int or type(glucose) == float:
                         glucoses.append(glucose)
             if not ages or not glucoses:
-                return [{"Message": "No suitable patients found."}]
+                return []
             
             # 2. Statistics (uses statistics_module)
             all_stats = {
@@ -109,7 +113,7 @@ class QueryModule:
             return [all_stats]
 
         except Exception as e:
-            print(f"Error in Query ii (heart diseases): {e}")
+            print(f"ERROR in Query ii (heart diseases): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -125,6 +129,8 @@ class QueryModule:
         Grouped by gender.
         """
         try:
+            if not self.dataset:
+                return []
             collected_data = {}
             for row in self.dataset:
                 # get necessary self.dataset
@@ -162,7 +168,7 @@ class QueryModule:
             return all_info
 
         except Exception as e:
-            print(f"Error in Query iii (hypertension stroke by gender): {e}")
+            print(f"ERROR in Query iii (hypertension stroke by gender): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -174,6 +180,8 @@ class QueryModule:
         for each physical activity level (Sedentary, Light, Moderate, Active).
         """
         try:
+            if not self.dataset:
+                return []
             activities_values = {}
             # Store/Sort every value into the dictionary
             for row in self.dataset:
@@ -215,7 +223,7 @@ class QueryModule:
             return averages
 
         except Exception as e:
-            print(f"Error in Query iv (averages physical activity level): {e}")
+            print(f"ERROR in Query iv (averages physical activity level): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -227,6 +235,8 @@ class QueryModule:
         who live in urban areas versus those in rural areas, for patients who had a stroke.
         """
         try:
+            if not self.dataset:
+                return []
             ages_rural = []
             ages_urban = []
             for row in self.dataset:
@@ -267,7 +277,7 @@ class QueryModule:
             return [rural_dict, urban_dict]
                 
         except Exception as e:
-            print(f"Error in Query v (urban vs rural areas with stroke): {e}")
+            print(f"ERROR in Query v (urban vs rural areas with stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -278,10 +288,10 @@ class QueryModule:
         Count number of different dietary habits for patients with stroke and no stroke.
         """
         try:
-            # 1. retrieve dietary habits
-            habits = []
             if not self.dataset:
                 return []
+            # 1. retrieve dietary habits
+            habits = []
             for row in self.dataset:
                 habit = row.get("Dietary Habits")
                 if habit not in habits:
@@ -314,7 +324,7 @@ class QueryModule:
             return [stroke_dict, no_stroke_dict]
 
         except Exception as e:
-            print(f"Error in Query vi (dietary: stroke vs no stroke): {e}")
+            print(f"ERROR in Query vi (dietary: stroke vs no stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -325,6 +335,8 @@ class QueryModule:
         Return all patients whose hypertension resulted in a stroke
         """
         try:
+            if not self.dataset:
+                return []
             result = []
             for row in self.dataset:
                 # get information
@@ -335,7 +347,7 @@ class QueryModule:
                     result.append(row)
             return result
         except Exception as e:
-            print(f"Error in Query vii (hypertension and stroke): {e}")
+            print(f"ERROR in Query vii (hypertension and stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -346,6 +358,8 @@ class QueryModule:
         Return all patients who have a heart disease and had a stroke
         """
         try:
+            if not self.dataset:
+                return []
             result = []
             for row in self.dataset:
                 # get information
@@ -356,7 +370,7 @@ class QueryModule:
                     result.append(row)
             return result
         except Exception as e:
-            print(f"Error in Query viii (heart diseases and stroke): {e}")
+            print(f"ERROR in Query viii (heart diseases and stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -367,6 +381,8 @@ class QueryModule:
         Calculate the average sleep hours for patients with and without a stroke
         """
         try:
+            if not self.dataset:
+                return []
             sleep_no_stroke = []
             sleep_stroke = []
             for row in self.dataset:
@@ -385,7 +401,7 @@ class QueryModule:
             }
             return [sleep_avg_stroke, sleep_avg_no_stroke]
         except Exception as e:
-            print(f"Error in Query ix (average sleep hours): {e}")
+            print(f"ERROR in Query ix (average sleep hours): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -405,9 +421,9 @@ class QueryModule:
         Return patients with given criteria
         """
         try:
-            # get keys
             if not self.dataset:
                 return []
+            # get keys
             keys = list(self.dataset[0].keys())
             # set string for each parameter
             params = {keys[1]: age, keys[2]: gender, keys[3]: hypertension, keys[4]: heartDisease, keys[5]: everMarried, 
@@ -460,14 +476,14 @@ class QueryModule:
                             relevant = False
                             break
 
-                # add the patient to the result list because it's relevant
+                # add the patient to the result list because he/she relevant
                 if relevant:
                     result.append(row)
             
             return result        
 
         except Exception as e:
-            print(f"Error in Query x (feature extraction): {e}")
+            print(f"ERROR in Query x (feature extraction): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -479,6 +495,8 @@ class QueryModule:
         Returns the count and percentage of patients in each category.
         """
         try:
+            if not self.dataset:
+                return []
             # calculate risk groups through all stroke risk scores
             low = []
             medium = []
@@ -506,7 +524,7 @@ class QueryModule:
                 result.append(information)
             return result
         except Exception as e:
-            print(f"Error in Query xi (group patients into stroke risk scores): {e}")
+            print(f"ERROR in Query xi (group patients into stroke risk scores): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -529,6 +547,8 @@ class QueryModule:
             return round(StatisticsModule.calculate_mean(feature_list), 2)
 
         try:
+            if not self.dataset:
+                return []
             # calculate region groups
             north = []
             south = []
@@ -562,5 +582,5 @@ class QueryModule:
                 result.append(information)
             return result
         except Exception as e:
-            print(f"Error in Query xii (summary of patients from specific regions): {e}")
+            print(f"ERROR in Query xii (summary of patients from specific regions): {e}")
             return []

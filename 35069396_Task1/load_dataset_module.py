@@ -43,36 +43,34 @@ class LoadDataset:
         """
         try:
             with open(self.filepath, 'r') as f:
-                csv_reader = csv.reader(f)
+                loaded_data = csv.reader(f)
                 # get header from first row
                 try:
-                    headers = next(csv_reader)
+                    headers = next(loaded_data)
                 except Exception:
                     print("ERROR: The file is empty.")
                     return None
 
                 row_number = 1
-                # go through all rows
-                for row in csv_reader:
+                # go through all rows of the file
+                for row in loaded_data:
                     row_number += 1
-                    # new storage for the rows (dict)
+                    # new storage for the row
                     new_row = {}
-                    i = 0
                     # go through all columns and sort values to headers (key)
-                    while i < len(headers):
+                    for i in range(len(headers)):
                         # get value just if there is content in this column
                         if i < len(row):
                             new_row[headers[i]] = row[i]
                         else:
                             # if there are columns with headers without content
                             new_row[headers[i]] = ""
-                        i += 1
                     try: 
                         # turn missing values into None and number into int/float
-                        parsed_row = self.process_row(new_row)
-                        self.dataset.append(parsed_row)
+                        finished_row = self.process_one_row(new_row)
+                        self.dataset.append(finished_row)
                     except Exception as e:
-                        print(f"Error while parsing row {row_number}: {e}. Row will be skipped.")            
+                        print(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
             
             print(f"Successfully loaded patient data: {len(self.dataset)}")
             return self.dataset
@@ -81,10 +79,10 @@ class LoadDataset:
             print(f"ERROR: The File {self.filepath} was not found.")
             return None
         except Exception as e:
-            print(f"Unknown Error while loading the dataset: {e}")
+            print(f"Unknown ERROR while loading the dataset: {e}")
             return None
 
-    def catch_missing_values(self, value):
+    def get_missing_values(self, value):
         """
         Returns True if a value represents a missing value (e.g. NaN)
         """
@@ -99,16 +97,16 @@ class LoadDataset:
         else:
             return False
 
-    def process_row(self, current_row):
+    def process_one_row(self, current_row):
         """
         Method parsing a row with converting into int or float if necessary/possible
         """
         row = {}
         for key, value in current_row.items():
-            # catch empty values ("") or "NaN" or "NN" etc. -> set to None
-            if self.catch_missing_values(value):
+            # get empty values ("") or "NaN" or "NN" etc. -> set to None
+            if self.get_missing_values(value):
                 row[key] = None
-                # skip remaining code in process_row
+                # skip remaining code in process_one_row
                 continue
 
             # parse data to int/float if possible
@@ -122,8 +120,5 @@ class LoadDataset:
                 except ValueError:
                     # not int or float -> string
                     row[key] = value
-            except Exception:
-                # in case something unexpected gone wrong
-                row[key] = None
         
         return row

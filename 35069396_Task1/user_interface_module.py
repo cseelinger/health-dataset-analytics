@@ -405,7 +405,7 @@ class UserInterface:
         # heading
         self.left_title = tk.Label(
             self.left_frame,
-            text="Queries / Analysis",
+            text="Queries",
             font=("Arial", 16, "bold")
         )
         self.left_title.pack(anchor="w", pady=(0, 10))
@@ -466,7 +466,7 @@ class UserInterface:
         # heading
         self.right_title = tk.Label(
             self.right_frame,
-            text="Descriptive Statistics / Features",
+            text="Descriptive Statistics",
             font=("Arial", 16, "bold")
         )
         self.right_title.pack(anchor="w", pady=(0, 10))
@@ -617,15 +617,16 @@ class UserInterface:
                 stroke_occ = self.get_bool_or_none(self.stroke_occ_var.get())
 
                 result = self.queries.query_filter_patients_by_criteria(
-                    age=exact_age, minAge=min_age, maxAge=max_age,
-                    gender=gender,hypertension=hypertension, heartDisease=heart_disease, everMarried=ever_married, 
-                    worktype=work_type, residenceType=residence_type, 
-                    averageGlucoseLevel=glucose, minAverageGlucoseLevel=min_glucose, maxAverageGlucoseLevel=max_glucose, 
-                    bmi=bmi, minBMI=min_bmi, maxBMI=max_bmi, 
-                    smokingStatus=smoking_status, physicalActivity=physical_act, dietaryHabits=dietary_habits, alcoholConsumption=alcohol, 
-                    chronicStress=chronic_stress, minSleepHours=min_sleep, sleepHours=sleep_hours, maxSleepHours=max_sleep, 
-                    familyHistoryOfStroke=family_stroke, educationLevel=education_level, incomeLevel=income_level, strokeRiskScore=stroke_risk, 
-                    minStrokeRiskScore=min_stroke, maxStrokeRiskScore=max_stroke, region=region, strokeOccurrence=stroke_occ
+                    age=exact_age, minAge=min_age, maxAge=max_age, gender=gender,
+                    hypertension=hypertension, heartDisease=heart_disease, everMarried=ever_married, 
+                    worktype=work_type, residenceType=residence_type, averageGlucoseLevel=glucose, 
+                    minAverageGlucoseLevel=min_glucose, maxAverageGlucoseLevel=max_glucose, bmi=bmi, 
+                    minBMI=min_bmi, maxBMI=max_bmi, smokingStatus=smoking_status, physicalActivity=physical_act, 
+                    dietaryHabits=dietary_habits, alcoholConsumption=alcohol, chronicStress=chronic_stress, 
+                    minSleepHours=min_sleep, sleepHours=sleep_hours, maxSleepHours=max_sleep, 
+                    familyHistoryOfStroke=family_stroke, educationLevel=education_level, incomeLevel=income_level, 
+                    strokeRiskScore=stroke_risk, minStrokeRiskScore=min_stroke, maxStrokeRiskScore=max_stroke, 
+                    region=region, strokeOccurrence=stroke_occ
                 )
             elif selection == "Categorize patients into Stroke Risk Groups":
                 result = self.queries.query_group_patients_stroke_risk()
@@ -665,7 +666,7 @@ class UserInterface:
         text_widget.delete("1.0", tk.END)
 
         if not result:
-            text_widget.insert(tk.END, "No results found.")
+            text_widget.insert(tk.END, "No suitable patients found.")
             return
 
         if isinstance(result, dict):

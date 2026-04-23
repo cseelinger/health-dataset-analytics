@@ -160,8 +160,8 @@ class StatisticsModule:
             return statistics
 
         except ValueError as e:
-            print(f"Error in {feature}: {e}")
+            print(f"ERROR in {feature}: {e}")
             return None
         except Exception as e:
-            print(f"An unexpected Error has occurred: {e}")
+            print(f"An unexpected ERROR has occurred: {e}")
             return None
