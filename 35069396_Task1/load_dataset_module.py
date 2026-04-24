@@ -7,8 +7,16 @@ The module should also handle any data type conversions needed
 (e.g., converting numeric strings to integers or floats).
 
 """
-
+import logging
+import sys
 import csv
+
+logging.basicConfig(
+    filename='code/test.log',
+    level=logging.INFO,
+    format = '%(asctime)s %(levelname)s %(message)s',
+    datefmt = '%y-%m-%d %H:%M:%S',
+)
 
 class LoadDataset:
     """
@@ -41,38 +49,50 @@ class LoadDataset:
         """
         Read and parse the dataset csv file and store it directly in self.dataset
         """
-        with open(self.filepath, 'r') as input_file:
-            loaded_data = csv.reader(input_file)
-            # get header from first row
-            try:
-                headers = next(loaded_data)
-            except Exception:
-                print("ERROR: The file is empty.")
-                return None
+        logging.info(f"Start loading dataset. Filepath: {self.filepath}")
+        try:
+            with open(self.filepath, 'r') as input_file:
+                loaded_data = csv.reader(input_file)
+                # get header from first row
+                try:
+                    headers = next(loaded_data)
+                except Exception:
+                    logging.error("The file is empty.")
+                    return None
 
-            row_number = 1
-            # go through all rows of the file
-            for row in loaded_data:
-                row_number += 1
-                # new storage for the row
-                new_row = {}
-                # go through all columns and sort values to headers (key)
-                for i in range(len(headers)):
-                    # get value just if there is content in this column
-                    if i < len(row):
-                        new_row[headers[i]] = row[i]
-                    else:
-                        # if there are columns with headers without content
-                        new_row[headers[i]] = ""
-                try: 
-                    # turn missing values into None and number into int/float
-                    finished_row = self.process_one_row(new_row)
-                    self.dataset.append(finished_row)
-                except Exception as e:
-                    print(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
-        
-        print(f"Successfully loaded patient data: {len(self.dataset)}")
-        return self.dataset
+                row_number = 1
+                # go through all rows of the file
+                for row in loaded_data:
+                    row_number += 1
+                    # new storage for the row
+                    new_row = {}
+                    # go through all columns and sort values to headers (key)
+                    for i in range(len(headers)):
+                        # get value just if there is content in this column
+                        if i < len(row):
+                            new_row[headers[i]] = row[i]
+                        else:
+                            # if there are columns with headers without content
+                            new_row[headers[i]] = ""
+                            logging.warning(f"Missing value in row {row_number}, column '{headers[i]}'.")
+                    try: 
+                        # turn missing values into None and number into int/float
+                        finished_row = self.process_one_row(new_row)
+                        self.dataset.append(finished_row)
+                    except Exception as e:
+                        logging.error(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
+            
+            logging.info(f"Successfully loaded patient data: {len(self.dataset)}")
+            return self.dataset
+
+        except FileNotFoundError as e:
+            logging.error(f"File not found in path: {self.filepath}. Information: {e}")
+            return None
+
+        except Exception as e:
+            logging.error(f"Unexpected error while loading dataset: {e}")
+            return None
+
 
     def get_missing_values(self, value):
         """
@@ -97,6 +117,7 @@ class LoadDataset:
         for key, value in current_row.items():
             # get empty values ("") or "NaN" or "NN" etc. -> set to None
             if self.get_missing_values(value):
+                logging.info(f"Missing value detected in column '{key}'. Set to None.")
                 row[key] = None
                 # skip remaining code in process_one_row
                 continue

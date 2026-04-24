@@ -94,6 +94,7 @@ class StatisticsModule:
             return 0
 
         variance = StatisticsModule.calculate_variance(values)
+
         return variance ** 0.5
 
     @staticmethod
@@ -119,36 +120,39 @@ class StatisticsModule:
         Takes a column name as input and calculates all relevant statistics.
         Returns a dictionary containing the results.
         """
-        # extract all valid (non-null and numeric) values from the column
-        values = []
-        for row in self.dataset:
-            val = row.get(feature)
-            # Check whether the value is a number (int or float)
-            if type(val) == int or type(val) == float:
-                values.append(val)
+        try:
+            # extract all valid (non-null and numeric) values from the column
+            values = []
+            for row in self.dataset:
+                val = row.get(feature)
+                # Check whether the value is a number (int or float)
+                if type(val) == int or type(val) == float:
+                    values.append(val)
 
-        # clculate statistics 
-        mean = round(self.calculate_mean(values), 2)
-        median = round(self.calculate_median(values), 2)
-        mode = self.calculate_mode(values)
-        standard_deviation = round(self.calculate_standard_deviation(values), 2)
-        variance = round(self.calculate_variance(values), 2)
-        minimum = self.calculate_min(values)
-        maximum = self.calculate_max(values)
-        rangee = self.calculate_range(values)
+            # clculate statistics 
+            mean = round(self.calculate_mean(values), 2)
+            median = round(self.calculate_median(values), 2)
+            mode = self.calculate_mode(values)
+            standard_deviation = round(self.calculate_standard_deviation(values), 2)
+            variance = round(self.calculate_variance(values), 2)
+            minimum = self.calculate_min(values)
+            maximum = self.calculate_max(values)
+            rangee = self.calculate_range(values)
 
-        # 4. store them in a dictionary
-        statistics = {
-            "Feature": feature,
-            "Count": len(values),
-            "Mean": mean,
-            "Median": median,
-            "Mode": mode,
-            "Standard Deviation": standard_deviation,
-            "Variance": variance,
-            "Minimum": minimum,
-            "Maximum": maximum,
-            "Range": rangee
-        }
+            # 4. store them in a dictionary
+            statistics = {
+                "Feature": feature,
+                "Count": len(values),
+                "Mean": mean,
+                "Median": median,
+                "Mode": mode,
+                "Standard Deviation": standard_deviation,
+                "Variance": variance,
+                "Minimum": minimum,
+                "Maximum": maximum,
+                "Range": rangee
+            }
 
-        return statistics
+            return statistics
+        except Exception as e:
+            print(f"ERROR in {feature}: {e}")
