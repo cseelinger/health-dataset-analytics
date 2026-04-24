@@ -4,6 +4,7 @@ for various information and insights.
 """
 
 import csv
+import logging
 from statistics_module import StatisticsModule
 
 class QueryModule:
@@ -15,8 +16,9 @@ class QueryModule:
         Save the result of a query (list of dictionaries) in a csv file
         """
         try:
+            logging.info("Start exporting results to csv.")
             if not data:
-                print(f"No data available for export in '{filename}'.")
+                logging.error(f"No data available for export in '{filename}'.")
                 return False
             
             headers = list(data[0].keys())
@@ -31,9 +33,10 @@ class QueryModule:
                     for column in headers:
                         values.append(row.get(column))
                     export_data.writerow(values)
+            logging.info("Successfully exported results.")
             return True
         except Exception as e:
-            print(f"ERROR while exporting to CSV: {e}")
+            logging.error(f"ERROR while exporting to CSV: {e}")
             return False
 
     # ----------------------------------------------------------------
@@ -45,6 +48,7 @@ class QueryModule:
         who smoke or have smoked AND have hypertension.
         """
         try:
+            logging.info("Start query i: Smokers with Hypertension.")
             if not self.dataset:
                 return []
             ages = []
@@ -74,9 +78,10 @@ class QueryModule:
                 "Modal Age": StatisticsModule.calculate_mode(ages)
             }
             # build result
+            logging.info("Successfully filtered query i.")
             return [all_stats]
         except Exception as e:
-            print(f"ERROR in Query i (smokers hypertension): {e}")
+            logging.error(f"ERROR in Query i (smokers hypertension): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -88,6 +93,7 @@ class QueryModule:
         of patients who have heart disease.
         """
         try:
+            logging.info("Start query ii: Patients with Heart Disease.")
             if not self.dataset:
                 return []
             # 1. filter data
@@ -115,9 +121,10 @@ class QueryModule:
                 "Modal Age": StatisticsModule.calculate_mode(ages),
                 "Average Glucose Level": round(StatisticsModule.calculate_mean(glucoses), 2)
             }
+            logging.info("Successfully filtered query ii.")
             return [all_stats]
         except Exception as e:
-            print(f"ERROR in Query ii (heart diseases): {e}")
+            logging.error(f"ERROR in Query ii (heart diseases): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -133,6 +140,7 @@ class QueryModule:
         Grouped by gender.
         """
         try:
+            logging.info("Start query iii: Patients with Hypertension, with/without Stroke, sort by Gender.")
             if not self.dataset:
                 return []
             collected_data = {}
@@ -169,9 +177,10 @@ class QueryModule:
                         })
 
             # build result
+            logging.info("Successfully filtered query iii.")
             return all_info
         except Exception as e:
-            print(f"ERROR in Query iii (hypertension stroke by gender): {e}")
+            logging.error(f"ERROR in Query iii (hypertension stroke by gender): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -183,6 +192,7 @@ class QueryModule:
         for each physical activity level (Sedentary, Light, Moderate, Active).
         """
         try:
+            logging.info("Start query iv: Average Values of Physical Activity Levels.")
             if not self.dataset:
                 return []
             activities_values = {}
@@ -223,9 +233,10 @@ class QueryModule:
                                 "Average Stroke Risk Score": round(StatisticsModule.calculate_mean(values["stroke_risk"]), 2)
                             })
             # build result
+            logging.info("Successfully filtered query iv.")
             return averages
         except Exception as e:
-            print(f"ERROR in Query iv (averages physical activity level): {e}")
+            logging.error(f"ERROR in Query iv (averages physical activity level): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -237,6 +248,7 @@ class QueryModule:
         who live in urban areas versus those in rural areas, for patients who had a stroke.
         """
         try:
+            logging.info("Start query v: Urban vs Rural: Average Values of Stroke Patients.")
             if not self.dataset:
                 return []
             ages_rural = []
@@ -276,9 +288,10 @@ class QueryModule:
                     }
 
             # build result
+            logging.info("Successfully filtered query v.")
             return [rural_dict, urban_dict]
         except Exception as e:
-            print(f"ERROR in Query v (urban vs rural areas with stroke): {e}")
+            logging.error(f"ERROR in Query v (urban vs rural areas with stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -289,6 +302,7 @@ class QueryModule:
         Count number of different dietary habits for patients with stroke and no stroke.
         """
         try:
+            logging.info("Start query vi: Stroke vs no Stroke: Dietary Habits.")
             if not self.dataset:
                 return []
             # 1. retrieve dietary habits
@@ -322,9 +336,10 @@ class QueryModule:
                 no_stroke_dict[habit] = dietary_no_stroke.count(habit)
 
             # build result
+            logging.info("Successfully filtered query vi.")
             return [stroke_dict, no_stroke_dict]
         except Exception as e:
-            print(f"ERROR in Query vi (dietary: stroke vs no stroke): {e}")
+            logging.error(f"ERROR in Query vi (dietary: stroke vs no stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -335,6 +350,7 @@ class QueryModule:
         Return all patients whose hypertension resulted in a stroke
         """
         try:
+            logging.info("Start query vii: Patients whose Hypertension resulted in a Stroke.")
             if not self.dataset:
                 return []
 
@@ -346,10 +362,11 @@ class QueryModule:
                 # only add patient to list if they have hypertension and stroke
                 if hypertension == 1 and stroke == 1:
                     result.append(row)
-            
+
+            logging.info("Successfully filtered query vii.")
             return result
         except Exception as e:
-            print(f"ERROR in Query vii (hypertension and stroke): {e}")
+            logging.error(f"ERROR in Query vii (hypertension and stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -360,6 +377,7 @@ class QueryModule:
         Return all patients who have a heart disease and had a stroke
         """
         try:
+            logging.info("Start query viii: Patients with Heart Disease and Stroke.")
             if not self.dataset:
                 return []
 
@@ -371,10 +389,11 @@ class QueryModule:
                 # only add patient to list if they have heart disease and stroke
                 if heart_disease == 1 and stroke == 1:
                     result.append(row)
-
+            
+            logging.info("Successfully filtered query viii.")
             return result
         except Exception as e:
-            print(f"ERROR in Query viii (heart diseases and stroke): {e}")
+            logging.error(f"ERROR in Query viii (heart diseases and stroke): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -385,6 +404,7 @@ class QueryModule:
         Calculate the average sleep hours for patients with and without a stroke
         """
         try:
+            logging.info("Start query ix: Average Sleep Hours of patients with and without Stroke.")
             if not self.dataset:
                 return []
 
@@ -405,13 +425,14 @@ class QueryModule:
                 "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_no_stroke), 2)
             }
 
+            logging.info("Successfully filtered query ix.")
             return [sleep_avg_stroke, sleep_avg_no_stroke]
         except Exception as e:
-            print(f"ERROR in Query ix (average sleep hours): {e}")
+            logging.error(f"ERROR in Query ix (average sleep hours): {e}")
             return []
 
     # ----------------------------------------------------------------
-    # x. Average sleep hours of patients with and without stroke
+    # x. Method to filter patients by given criteria
     # ----------------------------------------------------------------
     def query_filter_patients_by_criteria(self, age=None, minAge=None, maxAge=None, gender=None, hypertension=None, 
                                             heartDisease=None, everMarried=None, worktype=None, 
@@ -427,6 +448,7 @@ class QueryModule:
         Return patients with given criteria
         """
         try:
+            logging.info("Start query x: Filter patients by given criteria.")
             if not self.dataset:
                 return []
             # get keys
@@ -486,9 +508,10 @@ class QueryModule:
                 if relevant:
                     result.append(row)
             
+            logging.info("Successfully filtered query x.")
             return result
         except Exception as e:
-            print(f"ERROR in Query x (feature extraction): {e}")
+            logging.error(f"ERROR in Query x (feature extraction): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -500,6 +523,7 @@ class QueryModule:
         Returns the count and percentage of patients in each category.
         """
         try:
+            logging.info("Start query xi: Categorize patients into Stroke Risk Groups.")
             if not self.dataset:
                 return []
 
@@ -531,9 +555,10 @@ class QueryModule:
                 index += 1
                 result.append(information)
 
+            logging.info("Successfully filtered query xi.")
             return result
         except Exception as e:
-            print(f"ERROR in Query xi (group patients into stroke risk scores): {e}")
+            logging.error(f"ERROR in Query xi (group patients into stroke risk scores): {e}")
             return []
 
     # ----------------------------------------------------------------
@@ -555,6 +580,7 @@ class QueryModule:
                 return None
             return StatisticsModule.calculate_mean(feature_list)
 
+        logging.info("Start query xii: Patient summary for each region of living.")
         if not self.dataset:
             return []
 
@@ -592,7 +618,8 @@ class QueryModule:
                 index += 1
                 result.append(information)
             
+            logging.info("Successfully filtered query xii.")
             return result
         except Exception as e:
-            print(f"ERROR in Query xii (summary of patients from specific regions): {e}")
+            logging.error(f"ERROR in Query xii (summary of patients from specific regions): {e}")
             return []

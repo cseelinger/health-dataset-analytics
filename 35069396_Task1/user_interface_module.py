@@ -17,6 +17,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 from query_module import QueryModule
 from statistics_module import StatisticsModule
+import logging
 
 class UserInterface:
     def __init__(self, data):
@@ -516,6 +517,7 @@ class UserInterface:
         )
 
         if not result:
+            logging.warning("No data could be calculated from filter function.")
             messagebox.showwarning(title="WARNING", message="No data could be calculated.")
             return
 

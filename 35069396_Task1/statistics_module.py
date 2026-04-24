@@ -9,6 +9,7 @@ and return all relevant statistics (mean, median, mode, standard deviation, mini
 for that feature.
 
 """
+import logging
 
 class StatisticsModule:
     """
@@ -121,6 +122,7 @@ class StatisticsModule:
         Returns a dictionary containing the results.
         """
         try:
+            logging.info(f"Calculating descriptive statistics for {feature}")
             # extract all valid (non-null and numeric) values from the column
             values = []
             for row in self.dataset:
@@ -155,4 +157,4 @@ class StatisticsModule:
 
             return statistics
         except Exception as e:
-            print(f"ERROR in {feature}: {e}")
+            logging.error(f"ERROR in {feature}: {e}")

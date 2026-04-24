@@ -7,16 +7,8 @@ The module should also handle any data type conversions needed
 (e.g., converting numeric strings to integers or floats).
 
 """
-import logging
-import sys
 import csv
-
-logging.basicConfig(
-    filename='code/test.log',
-    level=logging.INFO,
-    format = '%(asctime)s %(levelname)s %(message)s',
-    datefmt = '%y-%m-%d %H:%M:%S',
-)
+import logging
 
 class LoadDataset:
     """
