@@ -1,10 +1,10 @@
 """
-Module that produces a user interface. Usage of tkinter. The user interface provides the 
-functionality for querying the system for any query in query_module and 
+Module that produces a user interface. Usage of tkinter. The user interface provides the
+functionality for querying the system for any query in query_module and
 displaying the results. The queries and displayed results are user-friendly.
 The interface should include:
 i.	 A menu or selection system allowing users to choose which query or analysis to perform.
-ii.	 Input fields where necessary (e.g., for entering age ranges, selecting regions, or choosing 
+ii.	 Input fields where necessary (e.g., for entering age ranges, selecting regions, or choosing
      filter criteria).
 iii. A results display area that presents the output in a clear, readable format.
 iv.	 An option to export query results to a CSV file.
@@ -18,6 +18,7 @@ from tkinter import messagebox
 from query_module import QueryModule
 from statistics_module import StatisticsModule
 import logging
+
 
 class UserInterface:
     def __init__(self, data):
@@ -80,12 +81,7 @@ class UserInterface:
         self.gender_var.set("")
 
         self.gender_menu = tk.OptionMenu(
-            parent,
-            self.gender_var,
-            "",
-            "Female",
-            "Male",
-            "Other"
+            parent, self.gender_var, "", "Female", "Male", "Other"
         )
 
         # hypertension
@@ -94,11 +90,7 @@ class UserInterface:
         self.hypertension_var.set("")
 
         self.hypertension_menu = tk.OptionMenu(
-            parent,
-            self.hypertension_var,
-            "",
-            "Yes",
-            "No"
+            parent, self.hypertension_var, "", "Yes", "No"
         )
 
         # heart disease
@@ -107,24 +99,16 @@ class UserInterface:
         self.heart_disease_var.set("")
 
         self.heart_disease_menu = tk.OptionMenu(
-            parent,
-            self.heart_disease_var,
-            "",
-            "Yes",
-            "No"
+            parent, self.heart_disease_var, "", "Yes", "No"
         )
-        
+
         # ever Married
         self.ever_married_label = tk.Label(parent, text="Ever Married:")
         self.ever_married_var = tk.StringVar()
         self.ever_married_var.set("")
 
         self.ever_married_menu = tk.OptionMenu(
-            parent,
-            self.ever_married_var,
-            "",
-            "Yes",
-            "No"
+            parent, self.ever_married_var, "", "Yes", "No"
         )
 
         # worktype
@@ -140,7 +124,7 @@ class UserInterface:
             "Private",
             "Never Worked",
             "Children",
-            "Self-employed"
+            "Self-employed",
         )
 
         # residence type
@@ -149,11 +133,7 @@ class UserInterface:
         self.residence_var.set("")
 
         self.residence_menu = tk.OptionMenu(
-            parent,
-            self.residence_var,
-            "",
-            "Rural",
-            "Urban"
+            parent, self.residence_var, "", "Rural", "Urban"
         )
 
         # glucose
@@ -176,12 +156,7 @@ class UserInterface:
         self.smoking_var.set("")
 
         self.smoking_menu = tk.OptionMenu(
-            parent,
-            self.smoking_var,
-            "",
-            "Never smoked",
-            "Formerly smoked",
-            "Smokes"
+            parent, self.smoking_var, "", "Never smoked", "Formerly smoked", "Smokes"
         )
         # physical activity
         self.physical_activity_label = tk.Label(parent, text="Physical Activity Level:")
@@ -195,7 +170,7 @@ class UserInterface:
             "Sedentary",
             "Light",
             "Active",
-            "Moderate"
+            "Moderate",
         )
         # dietary habits
         self.dietary_label = tk.Label(parent, text="Dietary Habits:")
@@ -203,37 +178,20 @@ class UserInterface:
         self.dietary_var.set("")
 
         self.dietary_menu = tk.OptionMenu(
-            parent,
-            self.dietary_var,
-            "",
-            "Vegetarian",
-            "Non-Vegetarian",
-            "Mixed"
+            parent, self.dietary_var, "", "Vegetarian", "Non-Vegetarian", "Mixed"
         )
         # alcohol consumption
         self.alcohol_label = tk.Label(parent, text="Alcohol Consumption:")
         self.alcohol_var = tk.StringVar()
         self.alcohol_var.set("")
 
-        self.alcohol_menu = tk.OptionMenu(
-            parent,
-            self.alcohol_var,
-            "",
-            "Yes",
-            "No"
-        )
+        self.alcohol_menu = tk.OptionMenu(parent, self.alcohol_var, "", "Yes", "No")
         # chronic stress
         self.stress_label = tk.Label(parent, text="Chronic Stress:")
         self.stress_var = tk.StringVar()
         self.stress_var.set("")
 
-        self.stress_menu = tk.OptionMenu(
-            parent,
-            self.stress_var,
-            "",
-            "Yes",
-            "No"
-        )
+        self.stress_menu = tk.OptionMenu(parent, self.stress_var, "", "Yes", "No")
         # sleep hours
         self.sleep_label = tk.Label(parent, text="Exact Sleep Hours:")
         self.sleep_entry = tk.Entry(parent)
@@ -246,25 +204,14 @@ class UserInterface:
         self.family_var = tk.StringVar()
         self.family_var.set("")
 
-        self.family_menu = tk.OptionMenu(
-            parent,
-            self.family_var,
-            "",
-            "Yes",
-            "No"
-        )
+        self.family_menu = tk.OptionMenu(parent, self.family_var, "", "Yes", "No")
         # education level
         self.education_label = tk.Label(parent, text="Education Level:")
         self.education_var = tk.StringVar()
         self.education_var.set("")
 
         self.education_menu = tk.OptionMenu(
-            parent,
-            self.education_var,
-            "",
-            "Primary",
-            "Secondary",
-            "Tertiary"
+            parent, self.education_var, "", "Primary", "Secondary", "Tertiary"
         )
         # income level
         self.income_label = tk.Label(parent, text="Income Level:")
@@ -272,12 +219,7 @@ class UserInterface:
         self.income_var.set("")
 
         self.income_menu = tk.OptionMenu(
-            parent,
-            self.income_var,
-            "",
-            "Low",
-            "Middle",
-            "High"
+            parent, self.income_var, "", "Low", "Middle", "High"
         )
         # stroke risk score
         self.stroke_risk_label = tk.Label(parent, text="Exact Stroke Risk Score:")
@@ -295,13 +237,7 @@ class UserInterface:
         self.region_var.set("")
 
         self.region_menu = tk.OptionMenu(
-            parent,
-            self.region_var,
-            "",
-            "North",
-            "South",
-            "East",
-            "West"
+            parent, self.region_var, "", "North", "South", "East", "West"
         )
 
         # stroke occurrence
@@ -310,11 +246,7 @@ class UserInterface:
         self.stroke_occ_var.set("")
 
         self.stroke_occ_menu = tk.OptionMenu(
-            parent,
-            self.stroke_occ_var,
-            "",
-            "Yes",
-            "No"
+            parent, self.stroke_occ_var, "", "Yes", "No"
         )
 
         # -----------------------------------
@@ -403,7 +335,7 @@ class UserInterface:
         # stroke occurrence
         self.stroke_occ_label.grid(row=15, column=2, sticky="w", padx=5, pady=5)
         self.stroke_occ_menu.grid(row=15, column=3, sticky="ew", padx=5, pady=5)
-    
+
     def open_filter_window(self):
         """
         Open a new window for selecting filter criteria.
@@ -420,10 +352,14 @@ class UserInterface:
         button_frame = tk.Frame(self.filter_window, padx=10, pady=10)
         button_frame.pack(fill="x", side="bottom")
 
-        ok_button = tk.Button(button_frame, text="OK", command=self.run_filter_query_from_window)
+        ok_button = tk.Button(
+            button_frame, text="OK", command=self.run_filter_query_from_window
+        )
         ok_button.pack(side="left")
 
-        quit_button = tk.Button(button_frame, text="Quit", command=self.filter_window.destroy)
+        quit_button = tk.Button(
+            button_frame, text="Quit", command=self.filter_window.destroy
+        )
         quit_button.pack(side="right")
 
     def run_filter_query_from_window(self):
@@ -504,21 +440,44 @@ class UserInterface:
         stroke_occ = self.get_bool_or_none(self.stroke_occ_var.get())
 
         result = self.queries.query_filter_patients_by_criteria(
-            age=exact_age, minAge=min_age, maxAge=max_age, gender=gender,
-            hypertension=hypertension, heartDisease=heart_disease, everMarried=ever_married,
-            worktype=work_type, residenceType=residence_type, averageGlucoseLevel=glucose,
-            minAverageGlucoseLevel=min_glucose, maxAverageGlucoseLevel=max_glucose, bmi=bmi,
-            minBMI=min_bmi, maxBMI=max_bmi, smokingStatus=smoking_status, physicalActivity=physical_act,
-            dietaryHabits=dietary_habits, alcoholConsumption=alcohol, chronicStress=chronic_stress,
-            minSleepHours=min_sleep, sleepHours=sleep_hours, maxSleepHours=max_sleep,
-            familyHistoryOfStroke=family_stroke, educationLevel=education_level, incomeLevel=income_level,
-            strokeRiskScore=stroke_risk, minStrokeRiskScore=min_stroke, maxStrokeRiskScore=max_stroke,
-            region=region, strokeOccurrence=stroke_occ
+            age=exact_age,
+            minAge=min_age,
+            maxAge=max_age,
+            gender=gender,
+            hypertension=hypertension,
+            heartDisease=heart_disease,
+            everMarried=ever_married,
+            worktype=work_type,
+            residenceType=residence_type,
+            averageGlucoseLevel=glucose,
+            minAverageGlucoseLevel=min_glucose,
+            maxAverageGlucoseLevel=max_glucose,
+            bmi=bmi,
+            minBMI=min_bmi,
+            maxBMI=max_bmi,
+            smokingStatus=smoking_status,
+            physicalActivity=physical_act,
+            dietaryHabits=dietary_habits,
+            alcoholConsumption=alcohol,
+            chronicStress=chronic_stress,
+            minSleepHours=min_sleep,
+            sleepHours=sleep_hours,
+            maxSleepHours=max_sleep,
+            familyHistoryOfStroke=family_stroke,
+            educationLevel=education_level,
+            incomeLevel=income_level,
+            strokeRiskScore=stroke_risk,
+            minStrokeRiskScore=min_stroke,
+            maxStrokeRiskScore=max_stroke,
+            region=region,
+            strokeOccurrence=stroke_occ,
         )
 
         if not result:
             logging.warning("No data could be calculated from filter function.")
-            messagebox.showwarning(title="WARNING", message="No data could be calculated.")
+            messagebox.showwarning(
+                title="WARNING", message="No data could be calculated."
+            )
             return
 
         self.last_left_result = result
@@ -533,9 +492,7 @@ class UserInterface:
         """
         # heading
         self.left_title = tk.Label(
-            self.left_frame,
-            text="Queries",
-            font=("Arial", 16, "bold")
+            self.left_frame, text="Queries", font=("Arial", 16, "bold")
         )
         self.left_title.pack(anchor="w", pady=(0, 10))
 
@@ -555,21 +512,17 @@ class UserInterface:
             "Average Sleep Hours of patients with and without Stroke",
             "Filter patients by following criteria:",
             "Categorize patients into Stroke Risk Groups",
-            "Patient summary for each region of living"
+            "Patient summary for each region of living",
         ]
 
         self.left_menu = tk.OptionMenu(
-            self.left_frame,
-            self.left_var,
-            *self.query_descriptions
+            self.left_frame, self.left_var, *self.query_descriptions
         )
         self.left_menu.pack(anchor="w", fill="x")
 
         # run button
         self.left_run_button = tk.Button(
-            self.left_frame,
-            text="Run",
-            command=self.run_query
+            self.left_frame, text="Run", command=self.run_query
         )
         self.left_run_button.pack(anchor="w", pady=(10, 10))
 
@@ -579,9 +532,7 @@ class UserInterface:
 
         # export button
         self.left_export_button = tk.Button(
-            self.left_frame,
-            text="Export Results",
-            command=self.export_left_result
+            self.left_frame, text="Export Results", command=self.export_left_result
         )
         self.left_export_button.pack(anchor="w", pady=(10, 0))
 
@@ -591,9 +542,7 @@ class UserInterface:
         """
         # heading
         self.right_title = tk.Label(
-            self.right_frame,
-            text="Descriptive Statistics",
-            font=("Arial", 16, "bold")
+            self.right_frame, text="Descriptive Statistics", font=("Arial", 16, "bold")
         )
         self.right_title.pack(anchor="w", pady=(0, 10))
 
@@ -606,21 +555,17 @@ class UserInterface:
             "BMI",
             "Average Glucose Level",
             "Sleep Hours",
-            "Stroke Risk Score"
+            "Stroke Risk Score",
         ]
 
         self.right_menu = tk.OptionMenu(
-            self.right_frame,
-            self.right_var,
-            *self.right_options
+            self.right_frame, self.right_var, *self.right_options
         )
         self.right_menu.pack(anchor="w", fill="x")
 
         # run button
         self.right_run_button = tk.Button(
-            self.right_frame,
-            text="Run",
-            command=self.run_descriptive_statistics
+            self.right_frame, text="Run", command=self.run_descriptive_statistics
         )
         self.right_run_button.pack(anchor="w", pady=(10, 10))
 
@@ -630,12 +575,10 @@ class UserInterface:
 
         # export button
         self.right_export_button = tk.Button(
-            self.right_frame,
-            text="Export Results",
-            command=self.export_right_result
+            self.right_frame, text="Export Results", command=self.export_right_result
         )
         self.right_export_button.pack(anchor="w", pady=(10, 0))
-    
+
     def get_int_or_none(self, integer):
         """
         Return int if parsable into int
@@ -644,7 +587,7 @@ class UserInterface:
         if value == "":
             return None
         return int(value)
-    
+
     def get_float_or_none(self, number):
         """
         Return float if parsable into float
@@ -682,7 +625,10 @@ class UserInterface:
             result = self.queries.query_smokers_hypertension()
         elif selection == "Patients with Heart Disease":
             result = self.queries.query_heart_disease()
-        elif selection == "Patients with Hypertension, with/without Stroke, sort by Gender":
+        elif (
+            selection
+            == "Patients with Hypertension, with/without Stroke, sort by Gender"
+        ):
             result = self.queries.query_hypertension_stroke_by_gender()
         elif selection == "Average Values of Physical Activity Levels":
             result = self.queries.query_averages_physical_activity_level()
@@ -706,9 +652,11 @@ class UserInterface:
         else:
             messagebox.showwarning(title="WARNING", message="No query is chosen.")
             return
-        
+
         if not result:
-            messagebox.showwarning(title="WARNING", message="No data could be calculated.")
+            messagebox.showwarning(
+                title="WARNING", message="No data could be calculated."
+            )
             return
 
         self.last_left_result = result
@@ -767,12 +715,13 @@ class UserInterface:
         Export the result of a query to a csv file.
         """
         if not self.last_left_result:
-            messagebox.showwarning(title="WARNING", message="No result available for export.")
+            messagebox.showwarning(
+                title="WARNING", message="No result available for export."
+            )
             return
 
         filename = filedialog.asksaveasfilename(
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv")]
+            defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
         )
 
         if not filename:
@@ -781,19 +730,22 @@ class UserInterface:
         success = self.queries.export_to_csv(self.last_left_result, filename)
 
         if success:
-            messagebox.showinfo(title="SUCCESS", message="Result exported successfully.")
+            messagebox.showinfo(
+                title="SUCCESS", message="Result exported successfully."
+            )
 
     def export_right_result(self):
         """
         Export the result of the descriptive statistics to a csv file.
         """
         if not self.last_right_result:
-            messagebox.showwarning(title="WARNING", message="No result available for export.")
+            messagebox.showwarning(
+                title="WARNING", message="No result available for export."
+            )
             return
 
         filename = filedialog.asksaveasfilename(
-            defaultextension=".csv",
-            filetypes=[("CSV files", "*.csv")]
+            defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
         )
 
         if not filename:
@@ -802,7 +754,8 @@ class UserInterface:
         success = self.queries.export_to_csv(self.last_right_result, filename)
 
         if success:
-            messagebox.showinfo(title="SUCCESS", message="Result exported successfully.")
+            messagebox.showinfo(
+                title="SUCCESS", message="Result exported successfully."
+            )
         else:
             messagebox.showerror(title="ERROR", message="Export failed.")
-

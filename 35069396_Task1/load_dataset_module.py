@@ -1,38 +1,41 @@
 """
-The data to be retrieved will be temporarily stored in memory (for additional processing) 
+The data to be retrieved will be temporarily stored in memory (for additional processing)
 using an appropriate data structure such as a dictionary or a list of dictionaries.
-This module should return a data structure (e.g., patient_data dictionary) that contains patient records 
-with their corresponding health features. 
-The module should also handle any data type conversions needed 
+This module should return a data structure (e.g., patient_data dictionary) that contains patient records
+with their corresponding health features.
+The module should also handle any data type conversions needed
 (e.g., converting numeric strings to integers or floats).
 
 """
+
 import csv
 import logging
+
 
 class LoadDataset:
     """
     Class to load and parse the dataset
     data is stored in an array of dictionaries, e.g.
-    [   
+    [
         <<-- first row -->>
-        {'ID': 1, 
-        'Age': 78, 
-        'Gender': 'Female', 
-        'Hypertension': 0, 
+        {'ID': 1,
+        'Age': 78,
+        'Gender': 'Female',
+        'Hypertension': 0,
         ...
-        'Stroke Occurrence': 0}, 
+        'Stroke Occurrence': 0},
 
         <<-- second row -->>
-        {'ID': 2, 
-        'Age': 60, 
-        'Gender': 'Female', 
-        'Hypertension': 0, 
+        {'ID': 2,
+        'Age': 60,
+        'Gender': 'Female',
+        'Hypertension': 0,
         ...},
 
         <<-- next rows -->>
     ]
     """
+
     def __init__(self, filepath):
         self.filepath = filepath
         self.dataset = []
@@ -43,7 +46,7 @@ class LoadDataset:
         """
         logging.info(f"Start loading dataset. Filepath: {self.filepath}")
         try:
-            with open(self.filepath, 'r') as input_file:
+            with open(self.filepath, "r") as input_file:
                 loaded_data = csv.reader(input_file)
                 # get header from first row
                 try:
@@ -66,14 +69,18 @@ class LoadDataset:
                         else:
                             # if there are columns with headers without content
                             new_row[headers[i]] = ""
-                            logging.warning(f"Missing value in row {row_number}, column '{headers[i]}'.")
-                    try: 
+                            logging.warning(
+                                f"Missing value in row {row_number}, column '{headers[i]}'."
+                            )
+                    try:
                         # turn missing values into None and number into int/float
                         finished_row = self.process_one_row(new_row)
                         self.dataset.append(finished_row)
                     except Exception as e:
-                        logging.error(f"ERROR while parsing row {row_number}: {e}. Row will be skipped.")            
-            
+                        logging.error(
+                            f"ERROR while parsing row {row_number}: {e}. Row will be skipped."
+                        )
+
             logging.info(f"Successfully loaded patient data: {len(self.dataset)}")
             return self.dataset
 
@@ -85,16 +92,28 @@ class LoadDataset:
             logging.error(f"Unexpected error while loading dataset: {e}")
             return None
 
-
     def get_missing_values(self, value):
         """
         Returns True if a value represents a missing value (e.g. NaN)
         """
         if value is None:
             return True
-        
-        missing_values = ["", "nan", "NaN", "nan", "none", "None", "null", "Null", "N/A", "n/a", "nn", "NN"]
-        
+
+        missing_values = [
+            "",
+            "nan",
+            "NaN",
+            "nan",
+            "none",
+            "None",
+            "null",
+            "Null",
+            "N/A",
+            "n/a",
+            "nn",
+            "NN",
+        ]
+
         # return true if it is a missing value so it can be set to None
         if value in missing_values:
             return True
@@ -125,5 +144,5 @@ class LoadDataset:
                 except ValueError:
                     # not int or float -> string
                     row[key] = value
-        
+
         return row

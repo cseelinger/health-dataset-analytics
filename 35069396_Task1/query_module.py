@@ -1,11 +1,12 @@
 """
-Query_module that contains several functions for querying the loaded self.datasetset 
-for various information and insights. 
+Query_module that contains several functions for querying the loaded self.datasetset
+for various information and insights.
 """
 
 import csv
 import logging
 from statistics_module import StatisticsModule
+
 
 class QueryModule:
     def __init__(self, data):
@@ -20,9 +21,9 @@ class QueryModule:
             if not data:
                 logging.error(f"No data available for export in '{filename}'.")
                 return False
-            
+
             headers = list(data[0].keys())
-            with open(filename, 'w', newline='') as output_file:
+            with open(filename, "w", newline="") as output_file:
                 export_data = csv.writer(output_file)
                 # column names
                 export_data.writerow(headers)
@@ -44,7 +45,7 @@ class QueryModule:
     # ----------------------------------------------------------------
     def query_smokers_hypertension(self):
         """
-        Returns the mean, modal and median ages of patients 
+        Returns the mean, modal and median ages of patients
         who smoke or have smoked AND have hypertension.
         """
         try:
@@ -54,22 +55,24 @@ class QueryModule:
             ages = []
             for row in self.dataset:
                 # check if hypertension and smoking
-                smoke_status = row.get('Smoking Status')
-                hypertension = row.get('Hypertension')
+                smoke_status = row.get("Smoking Status")
+                hypertension = row.get("Hypertension")
 
                 # it is a smoking person with hypertension
-                if hypertension == 1 and (smoke_status == 'Smokes' or smoke_status == 'Formerly smoked'):
-                    age = int(row.get('Age'))
+                if hypertension == 1 and (
+                    smoke_status == "Smokes" or smoke_status == "Formerly smoked"
+                ):
+                    age = int(row.get("Age"))
                     # add age to ages list
                     ages.append(age)
             if not ages:
                 return []
-            
+
             # 2. Statistics (uses statistics_module)
             all_stats = {
                 "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                 "Median Age": round(StatisticsModule.calculate_median(ages), 2),
-                "Modal Age": StatisticsModule.calculate_mode(ages)
+                "Modal Age": StatisticsModule.calculate_mode(ages),
             }
             # build result
             logging.info("Successfully filtered query i.")
@@ -95,25 +98,27 @@ class QueryModule:
             glucoses = []
             for row in self.dataset:
                 # check if heart disease
-                heart_disease = row.get('Heart Disease')
+                heart_disease = row.get("Heart Disease")
 
                 # it is person with heart disease
                 if heart_disease == 1:
-                    age = row.get('Age')
-                    glucose = row.get('Average Glucose Level')
+                    age = row.get("Age")
+                    glucose = row.get("Average Glucose Level")
                     if isinstance(age, int):
                         ages.append(age)
                     if isinstance(glucose, (int, float)):
                         glucoses.append(glucose)
             if not ages or not glucoses:
                 return []
-            
+
             # 2. Statistics (uses statistics_module)
             all_stats = {
                 "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
                 "Median Age": round(StatisticsModule.calculate_median(ages), 2),
                 "Modal Age": StatisticsModule.calculate_mode(ages),
-                "Average Glucose Level": round(StatisticsModule.calculate_mean(glucoses), 2)
+                "Average Glucose Level": round(
+                    StatisticsModule.calculate_mean(glucoses), 2
+                ),
             }
             logging.info("Successfully filtered query ii.")
             return [all_stats]
@@ -134,24 +139,26 @@ class QueryModule:
         Grouped by gender.
         """
         try:
-            logging.info("Start query iii: Patients with Hypertension, with/without Stroke, sort by Gender.")
+            logging.info(
+                "Start query iii: Patients with Hypertension, with/without Stroke, sort by Gender."
+            )
             if not self.dataset:
                 return []
             collected_data = {}
             for row in self.dataset:
                 # get necessary self.dataset
-                hypertension = int(row.get('Hypertension'))
-                stroke = int(row.get('Stroke Occurrence'))
-                gender = row.get('Gender')
-                age = row.get('Age')
+                hypertension = int(row.get("Hypertension"))
+                stroke = int(row.get("Stroke Occurrence"))
+                gender = row.get("Gender")
+                age = row.get("Age")
 
                 # only include patients with hypertension
                 if hypertension == 1:
                     # add new gender group (e.g. "Other") if not already in dict
                     if gender not in collected_data:
                         collected_data[gender] = {
-                            "Stroke":    [], # with stroke
-                            "No Stroke": []  # without stroke
+                            "Stroke": [],  # with stroke
+                            "No Stroke": [],  # without stroke
                         }
                     stroke_store_name = "Stroke" if stroke == 1 else "No Stroke"
                     # store age in correct gender/stroke combination
@@ -162,13 +169,21 @@ class QueryModule:
             for gender, stroke_groups in collected_data.items():
                 for stroke_status, ages in stroke_groups.items():
                     if ages:
-                        all_info.append({
-                            "Gender": gender,
-                            "Stroke Occurrence": "Yes" if stroke_status == "Stroke" else "No",
-                            "Average Age": round(StatisticsModule.calculate_mean(ages), 2),
-                            "Median Age": round(StatisticsModule.calculate_median(ages), 2),
-                            "Modal Age": StatisticsModule.calculate_mode(ages)
-                        })
+                        all_info.append(
+                            {
+                                "Gender": gender,
+                                "Stroke Occurrence": (
+                                    "Yes" if stroke_status == "Stroke" else "No"
+                                ),
+                                "Average Age": round(
+                                    StatisticsModule.calculate_mean(ages), 2
+                                ),
+                                "Median Age": round(
+                                    StatisticsModule.calculate_median(ages), 2
+                                ),
+                                "Modal Age": StatisticsModule.calculate_mode(ages),
+                            }
+                        )
 
             # build result
             logging.info("Successfully filtered query iii.")
@@ -182,7 +197,7 @@ class QueryModule:
     # ----------------------------------------------------------------
     def query_averages_physical_activity_level(self):
         """
-        Computes the average BMI, average glucose level, and average stroke risk score 
+        Computes the average BMI, average glucose level, and average stroke risk score
         for each physical activity level (Sedentary, Light, Moderate, Active).
         """
         try:
@@ -192,21 +207,21 @@ class QueryModule:
             activities_values = {}
             # Store/Sort every value into the dictionary
             for row in self.dataset:
-                activity = row.get('Physical Activity')
+                activity = row.get("Physical Activity")
                 if not activity:
                     continue
-                
+
                 # add activity level to the dict if not yet available
                 if activity not in activities_values:
                     activities_values[activity] = {
-                        "bmi": [],        # store all bmi values of this activity level
-                        "glucose": [],    # store all glucose values of this activity level
-                        "stroke_risk": [] # store all stroke risk values of this activity level
+                        "bmi": [],  # store all bmi values of this activity level
+                        "glucose": [],  # store all glucose values of this activity level
+                        "stroke_risk": [],  # store all stroke risk values of this activity level
                     }
                 # get values
-                bmi = row.get('BMI')
-                glucose = row.get('Average Glucose Level')
-                stroke_risk = row.get('Stroke Risk Score')
+                bmi = row.get("BMI")
+                glucose = row.get("Average Glucose Level")
+                stroke_risk = row.get("Stroke Risk Score")
                 # add every value to the list
                 if isinstance(bmi, (int, float)):
                     activities_values[activity]["bmi"].append(bmi)
@@ -220,12 +235,21 @@ class QueryModule:
 
             for level, values in activities_values.items():
                 if values["bmi"] and values["glucose"] and values["stroke_risk"]:
-                    averages.append({
-                                "Physical Activity": level,
-                                "Average BMI": round(StatisticsModule.calculate_mean(values["bmi"]), 2),
-                                "Average Glucose Level": round(StatisticsModule.calculate_mean(values["glucose"]), 2),
-                                "Average Stroke Risk Score": round(StatisticsModule.calculate_mean(values["stroke_risk"]), 2)
-                            })
+                    averages.append(
+                        {
+                            "Physical Activity": level,
+                            "Average BMI": round(
+                                StatisticsModule.calculate_mean(values["bmi"]), 2
+                            ),
+                            "Average Glucose Level": round(
+                                StatisticsModule.calculate_mean(values["glucose"]), 2
+                            ),
+                            "Average Stroke Risk Score": round(
+                                StatisticsModule.calculate_mean(values["stroke_risk"]),
+                                2,
+                            ),
+                        }
+                    )
             # build result
             logging.info("Successfully filtered query iv.")
             return averages
@@ -238,20 +262,22 @@ class QueryModule:
     # ----------------------------------------------------------------
     def query_urban_vs_rural_areas_with_stroke(self):
         """
-        Computing the average age, modal age, and median age of patients 
+        Computing the average age, modal age, and median age of patients
         who live in urban areas versus those in rural areas, for patients who had a stroke.
         """
         try:
-            logging.info("Start query v: Urban vs Rural: Average Values of Stroke Patients.")
+            logging.info(
+                "Start query v: Urban vs Rural: Average Values of Stroke Patients."
+            )
             if not self.dataset:
                 return []
             ages_rural = []
             ages_urban = []
             for row in self.dataset:
                 # get data
-                stroke = row.get('Stroke Occurrence')
-                residence = row.get('Residence Type')
-                age = row.get('Age')
+                stroke = row.get("Stroke Occurrence")
+                residence = row.get("Residence Type")
+                age = row.get("Age")
 
                 # just patients with stroke
                 if stroke != 1:
@@ -262,24 +288,24 @@ class QueryModule:
                 # add age to urban list
                 if residence == "Urban":
                     ages_urban.append(age)
-            
+
             # build result dicts
             rural_dict = {}
             urban_dict = {}
             # rural
             rural_dict = {
-                        "Residence Type": "Rural",
-                        "Average Age": round(StatisticsModule.calculate_mean(ages_rural), 2),
-                        "Modal Age": StatisticsModule.calculate_mode(ages_rural),
-                        "Median Age": round(StatisticsModule.calculate_median(ages_rural), 2)
-                    }
+                "Residence Type": "Rural",
+                "Average Age": round(StatisticsModule.calculate_mean(ages_rural), 2),
+                "Modal Age": StatisticsModule.calculate_mode(ages_rural),
+                "Median Age": round(StatisticsModule.calculate_median(ages_rural), 2),
+            }
             # urban
             urban_dict = {
-                        "Residence Type": "Urban",
-                        "Average Age": round(StatisticsModule.calculate_mean(ages_urban), 2),
-                        "Modal Age": StatisticsModule.calculate_mode(ages_urban),
-                        "Median Age": round(StatisticsModule.calculate_median(ages_urban), 2)
-                    }
+                "Residence Type": "Urban",
+                "Average Age": round(StatisticsModule.calculate_mean(ages_urban), 2),
+                "Modal Age": StatisticsModule.calculate_mode(ages_urban),
+                "Median Age": round(StatisticsModule.calculate_median(ages_urban), 2),
+            }
 
             # build result
             logging.info("Successfully filtered query v.")
@@ -318,12 +344,8 @@ class QueryModule:
                 if stroke == 0:
                     dietary_no_stroke.append(habit)
 
-            stroke_dict = {
-                "Stroke Occurrence": "Yes"
-            }
-            no_stroke_dict = {
-                "Stroke Occurrence": "No"
-            }
+            stroke_dict = {"Stroke Occurrence": "Yes"}
+            no_stroke_dict = {"Stroke Occurrence": "No"}
             # add all habits for stroke and no stroke to the dict
             for habit in habits:
                 stroke_dict[habit] = dietary_stroke.count(habit)
@@ -344,7 +366,9 @@ class QueryModule:
         Return all patients whose hypertension resulted in a stroke
         """
         try:
-            logging.info("Start query vii: Patients whose Hypertension resulted in a Stroke.")
+            logging.info(
+                "Start query vii: Patients whose Hypertension resulted in a Stroke."
+            )
             if not self.dataset:
                 return []
 
@@ -383,7 +407,7 @@ class QueryModule:
                 # only add patient to list if they have heart disease and stroke
                 if heart_disease == 1 and stroke == 1:
                     result.append(row)
-            
+
             logging.info("Successfully filtered query viii.")
             return result
         except Exception as e:
@@ -398,7 +422,9 @@ class QueryModule:
         Calculate the average sleep hours for patients with and without a stroke
         """
         try:
-            logging.info("Start query ix: Average Sleep Hours of patients with and without Stroke.")
+            logging.info(
+                "Start query ix: Average Sleep Hours of patients with and without Stroke."
+            )
             if not self.dataset:
                 return []
 
@@ -412,11 +438,15 @@ class QueryModule:
                     sleep_no_stroke.append(row.get("Sleep Hours"))
             sleep_avg_stroke = {
                 "Stroke Occurrence": "Yes",
-                "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_stroke), 2)
+                "Average sleep hours": round(
+                    StatisticsModule.calculate_mean(sleep_stroke), 2
+                ),
             }
             sleep_avg_no_stroke = {
                 "Stroke Occurrence": "No",
-                "Average sleep hours": round(StatisticsModule.calculate_mean(sleep_no_stroke), 2)
+                "Average sleep hours": round(
+                    StatisticsModule.calculate_mean(sleep_no_stroke), 2
+                ),
             }
 
             logging.info("Successfully filtered query ix.")
@@ -428,16 +458,40 @@ class QueryModule:
     # ----------------------------------------------------------------
     # x. Method to filter patients by given criteria
     # ----------------------------------------------------------------
-    def query_filter_patients_by_criteria(self, age=None, minAge=None, maxAge=None, gender=None, hypertension=None, 
-                                            heartDisease=None, everMarried=None, worktype=None, 
-                                            residenceType=None, averageGlucoseLevel=None, minAverageGlucoseLevel=None, 
-                                            maxAverageGlucoseLevel=None, bmi=None, minBMI=None, maxBMI=None, 
-                                            smokingStatus=None, physicalActivity=None, 
-                                            dietaryHabits=None, alcoholConsumption=None, 
-                                            chronicStress=None, minSleepHours=None, sleepHours=None, 
-                                            maxSleepHours=None, familyHistoryOfStroke=None, 
-                                            educationLevel=None, incomeLevel=None, strokeRiskScore=None, 
-                                            minStrokeRiskScore=None, maxStrokeRiskScore=None, region=None, strokeOccurrence=None):
+    def query_filter_patients_by_criteria(
+        self,
+        age=None,
+        minAge=None,
+        maxAge=None,
+        gender=None,
+        hypertension=None,
+        heartDisease=None,
+        everMarried=None,
+        worktype=None,
+        residenceType=None,
+        averageGlucoseLevel=None,
+        minAverageGlucoseLevel=None,
+        maxAverageGlucoseLevel=None,
+        bmi=None,
+        minBMI=None,
+        maxBMI=None,
+        smokingStatus=None,
+        physicalActivity=None,
+        dietaryHabits=None,
+        alcoholConsumption=None,
+        chronicStress=None,
+        minSleepHours=None,
+        sleepHours=None,
+        maxSleepHours=None,
+        familyHistoryOfStroke=None,
+        educationLevel=None,
+        incomeLevel=None,
+        strokeRiskScore=None,
+        minStrokeRiskScore=None,
+        maxStrokeRiskScore=None,
+        region=None,
+        strokeOccurrence=None,
+    ):
         """
         Return patients with given criteria
         """
@@ -448,45 +502,74 @@ class QueryModule:
             # get keys
             keys = list(self.dataset[0].keys())
             # set string for each parameter
-            params = {keys[1]: age, keys[2]: gender, keys[3]: hypertension, keys[4]: heartDisease, keys[5]: everMarried, 
-                        keys[6]: worktype, keys[7]: residenceType, keys[8]: averageGlucoseLevel, keys[9]: bmi, 
-                        keys[10]: smokingStatus, keys[11]: physicalActivity, keys[12]: dietaryHabits, 
-                        keys[13]: alcoholConsumption, keys[14]: chronicStress, keys[15]: sleepHours, 
-                        keys[16]: familyHistoryOfStroke, keys[17]: educationLevel, keys[18]: incomeLevel, 
-                        keys[19]: strokeRiskScore, keys[20]: region, keys[21]: strokeOccurrence}
+            params = {
+                keys[1]: age,
+                keys[2]: gender,
+                keys[3]: hypertension,
+                keys[4]: heartDisease,
+                keys[5]: everMarried,
+                keys[6]: worktype,
+                keys[7]: residenceType,
+                keys[8]: averageGlucoseLevel,
+                keys[9]: bmi,
+                keys[10]: smokingStatus,
+                keys[11]: physicalActivity,
+                keys[12]: dietaryHabits,
+                keys[13]: alcoholConsumption,
+                keys[14]: chronicStress,
+                keys[15]: sleepHours,
+                keys[16]: familyHistoryOfStroke,
+                keys[17]: educationLevel,
+                keys[18]: incomeLevel,
+                keys[19]: strokeRiskScore,
+                keys[20]: region,
+                keys[21]: strokeOccurrence,
+            }
             result = []
             for row in self.dataset:
                 # go through all min/max possible values
                 # min age
                 if minAge is not None and row.get("Age") < minAge:
-                        continue
+                    continue
                 # max age
                 if maxAge is not None and row.get("Age") > maxAge:
-                        continue
+                    continue
                 # min glucose level
-                if minAverageGlucoseLevel is not None and row.get("Average Glucose Level") < minAverageGlucoseLevel:
-                        continue
+                if (
+                    minAverageGlucoseLevel is not None
+                    and row.get("Average Glucose Level") < minAverageGlucoseLevel
+                ):
+                    continue
                 # max glucose level
-                if maxAverageGlucoseLevel is not None and row.get("Average Glucose Level") > maxAverageGlucoseLevel:
-                        continue
+                if (
+                    maxAverageGlucoseLevel is not None
+                    and row.get("Average Glucose Level") > maxAverageGlucoseLevel
+                ):
+                    continue
                 # min sleep hours
                 if minSleepHours is not None and row.get("Sleep Hours") < minSleepHours:
-                        continue
+                    continue
                 # max sleep hours
                 if maxSleepHours is not None and row.get("Sleep Hours") > maxSleepHours:
-                        continue
+                    continue
                 # min bmi
                 if minBMI is not None and row.get("BMI") < minBMI:
-                        continue
+                    continue
                 # max bmi
                 if maxBMI is not None and row.get("BMI") > maxBMI:
-                        continue
+                    continue
                 # min StrokeRiskScore
-                if minStrokeRiskScore is not None and row.get("Stroke Risk Score") < minStrokeRiskScore:
-                        continue
+                if (
+                    minStrokeRiskScore is not None
+                    and row.get("Stroke Risk Score") < minStrokeRiskScore
+                ):
+                    continue
                 # max StrokeRiskScore
-                if maxStrokeRiskScore is not None and row.get("Stroke Risk Score") > maxStrokeRiskScore:
-                        continue
+                if (
+                    maxStrokeRiskScore is not None
+                    and row.get("Stroke Risk Score") > maxStrokeRiskScore
+                ):
+                    continue
                 # go through all other values (no min/max)
                 relevant = True
                 for key, value in params.items():
@@ -501,7 +584,7 @@ class QueryModule:
                 # add the patient to the result list because he/she relevant
                 if relevant:
                     result.append(row)
-            
+
             logging.info("Successfully filtered query x.")
             return result
         except Exception as e:
@@ -544,7 +627,7 @@ class QueryModule:
                 information = {
                     "Stroke Risk Level": f"{levels[index]}",
                     "Count": len(group),
-                    "Percentage": round((len(group) / len(self.dataset)) * 100, 2)
+                    "Percentage": round((len(group) / len(self.dataset)) * 100, 2),
                 }
                 index += 1
                 result.append(information)
@@ -552,7 +635,9 @@ class QueryModule:
             logging.info("Successfully filtered query xi.")
             return result
         except Exception as e:
-            logging.error(f"ERROR in Query xi (group patients into stroke risk scores): {e}")
+            logging.error(
+                f"ERROR in Query xi (group patients into stroke risk scores): {e}"
+            )
             return []
 
     # ----------------------------------------------------------------
@@ -560,9 +645,10 @@ class QueryModule:
     # ----------------------------------------------------------------
     def query_summary_report_for_region(self):
         """
-        Generate a summary report comparing health statistics across different regions (North, South, East, West), 
+        Generate a summary report comparing health statistics across different regions (North, South, East, West),
         including average age, average BMI, average glucose level, and stroke occurrence rate for each region.
         """
+
         def get_average_of_feature(patients, feature):
             """
             Small funktion to calculate the average of a feature
@@ -606,14 +692,20 @@ class QueryModule:
                     "Count": len(group),
                     "Average Age": round(get_average_of_feature(group, "Age"), 2),
                     "Average BMI": round(get_average_of_feature(group, "BMI"), 2),
-                    "Average Glucose Level": round(get_average_of_feature(group, "Average Glucose Level"), 2),
-                    "Stroke Occurrence Rate": round(get_average_of_feature(group, "Stroke Occurrence") * 100, 2) # in percent
+                    "Average Glucose Level": round(
+                        get_average_of_feature(group, "Average Glucose Level"), 2
+                    ),
+                    "Stroke Occurrence Rate": round(
+                        get_average_of_feature(group, "Stroke Occurrence") * 100, 2
+                    ),  # in percent
                 }
                 index += 1
                 result.append(information)
-            
+
             logging.info("Successfully filtered query xii.")
             return result
         except Exception as e:
-            logging.error(f"ERROR in Query xii (summary of patients from specific regions): {e}")
+            logging.error(
+                f"ERROR in Query xii (summary of patients from specific regions): {e}"
+            )
             return []

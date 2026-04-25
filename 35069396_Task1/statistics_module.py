@@ -1,20 +1,23 @@
 """
-This module should implement functions for statistical analysis of the dataset features. 
-The statistical functions should include the following: 
-mean, mode, median, standard deviation, minimum, maximum, variance, and range. 
+This module should implement functions for statistical analysis of the dataset features.
+The statistical functions should include the following:
+mean, mode, median, standard deviation, minimum, maximum, variance, and range.
 These functions will be used by other modules to compute statistics for different patient groups.
-Additionally, implement a function that returns descriptive statistics for any specified numeric feature 
-of the dataset. This function should accept a feature name as a parameter 
-and return all relevant statistics (mean, median, mode, standard deviation, minimum, maximum, variance, range) 
+Additionally, implement a function that returns descriptive statistics for any specified numeric feature
+of the dataset. This function should accept a feature name as a parameter
+and return all relevant statistics (mean, median, mode, standard deviation, minimum, maximum, variance, range)
 for that feature.
 
 """
+
 import logging
+
 
 class StatisticsModule:
     """
     Class to perform statistical analyses on the patient dataset
     """
+
     def __init__(self, dataset):
         # Initialize statistic module with the loaded data
         self.dataset = dataset
@@ -63,7 +66,7 @@ class StatisticsModule:
                 max_count = count
                 max_val = val
         return max_val
-    
+
     @staticmethod
     def calculate_variance(values):
         if not values:
@@ -82,7 +85,7 @@ class StatisticsModule:
             # sum squared part of variance
             variance = variance + (val - mean_value) ** 2
         return variance / (len(values) - 1)
-    
+
     @staticmethod
     def calculate_standard_deviation(values):
         if not values:
@@ -96,7 +99,7 @@ class StatisticsModule:
 
         variance = StatisticsModule.calculate_variance(values)
 
-        return variance ** 0.5
+        return variance**0.5
 
     @staticmethod
     def calculate_min(values):
@@ -131,7 +134,7 @@ class StatisticsModule:
                 if isinstance(val, (int, float)):
                     values.append(val)
 
-            # clculate statistics 
+            # clculate statistics
             mean = round(self.calculate_mean(values), 2)
             median = round(self.calculate_median(values), 2)
             mode = self.calculate_mode(values)
@@ -152,7 +155,7 @@ class StatisticsModule:
                 "Variance": variance,
                 "Minimum": minimum,
                 "Maximum": maximum,
-                "Range": rangee
+                "Range": rangee,
             }
 
             return statistics
