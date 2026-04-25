@@ -586,7 +586,11 @@ class UserInterface:
         value = integer.get().strip()
         if value == "":
             return None
-        return int(value)
+        try:
+            return int(value)
+        except ValueError:
+            messagebox.showerror(title="ERROR", message=f"{value} is not an integer.")
+            return None
 
     def get_float_or_none(self, number):
         """
@@ -595,7 +599,11 @@ class UserInterface:
         value = number.get().strip()
         if value == "":
             return None
-        return float(value)
+        try:
+            return float(value)
+        except ValueError:
+            messagebox.showerror(title="ERROR", message=f"{value} is not a float.")
+            return None
 
     def get_string_or_none(self, value):
         """
@@ -729,10 +737,14 @@ class UserInterface:
 
         success = self.queries.export_to_csv(self.last_left_result, filename)
 
+        success = self.queries.export_to_csv(self.last_right_result, filename)
+
         if success:
             messagebox.showinfo(
                 title="SUCCESS", message="Result exported successfully."
             )
+        else:
+            messagebox.showerror(title="ERROR", message="Export failed.")
 
     def export_right_result(self):
         """

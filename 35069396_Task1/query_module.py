@@ -503,7 +503,7 @@ class QueryModule:
             logging.info("Start query x: Filter patients by given criteria.")
             if not self.dataset:
                 return []
-                
+
             # set string for each parameter
             params = {
                 "Age": age,
@@ -657,11 +657,20 @@ class QueryModule:
             Small funktion to calculate the average of a feature
             """
             feature_list = []
+
             for patient in patients:
-                feature_list.append(patient.get(feature))
+                value = patient.get(feature)
+                # check for int or float for calculating later
+                if isinstance(value, (int, float)):
+                    feature_list.append(value)
+
             if not feature_list:
                 return None
-            return StatisticsModule.calculate_mean(feature_list)
+            # get the stroke occurrence rate in percent
+            if feature == "Stroke Occurrence":
+                return round(StatisticsModule.calculate_mean(feature_list) * 100, 2)
+            # otherwise just calculate the mean and round
+            return round(StatisticsModule.calculate_mean(feature_list), 2)
 
         logging.info("Start query xii: Patient summary for each region of living.")
         if not self.dataset:
@@ -693,14 +702,14 @@ class QueryModule:
                 information = {
                     "Region": f"{regions[index]}",
                     "Count": len(group),
-                    "Average Age": round(get_average_of_feature(group, "Age"), 2),
-                    "Average BMI": round(get_average_of_feature(group, "BMI"), 2),
-                    "Average Glucose Level": round(
-                        get_average_of_feature(group, "Average Glucose Level"), 2
+                    "Average Age": get_average_of_feature(group, "Age"),
+                    "Average BMI": get_average_of_feature(group, "BMI"),
+                    "Average Glucose Level": get_average_of_feature(
+                        group, "Average Glucose Level"
                     ),
-                    "Stroke Occurrence Rate": round(
-                        get_average_of_feature(group, "Stroke Occurrence") * 100, 2
-                    ),  # in percent
+                    "Stroke Occurrence Rate": get_average_of_feature(
+                        group, "Stroke Occurrence"
+                    ),
                 }
                 index += 1
                 result.append(information)
