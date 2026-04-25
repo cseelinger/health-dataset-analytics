@@ -737,8 +737,6 @@ class UserInterface:
 
         success = self.queries.export_to_csv(self.last_left_result, filename)
 
-        success = self.queries.export_to_csv(self.last_right_result, filename)
-
         if success:
             messagebox.showinfo(
                 title="SUCCESS", message="Result exported successfully."
