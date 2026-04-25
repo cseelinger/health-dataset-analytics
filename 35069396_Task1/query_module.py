@@ -64,12 +64,6 @@ class QueryModule:
                     ages.append(age)
             if not ages:
                 return []
-
-            for i in ages:
-                try:
-                    y = int(i)
-                except Exception:
-                    print(i)
             
             # 2. Statistics (uses statistics_module)
             all_stats = {
@@ -107,9 +101,9 @@ class QueryModule:
                 if heart_disease == 1:
                     age = row.get('Age')
                     glucose = row.get('Average Glucose Level')
-                    if type(age) == int:
+                    if isinstance(age, int):
                         ages.append(age)
-                    if type(glucose) == int or type(glucose) == float:
+                    if isinstance(glucose, (int, float)):
                         glucoses.append(glucose)
             if not ages or not glucoses:
                 return []
@@ -214,11 +208,11 @@ class QueryModule:
                 glucose = row.get('Average Glucose Level')
                 stroke_risk = row.get('Stroke Risk Score')
                 # add every value to the list
-                if type(bmi) == int or type(bmi) == float:
+                if isinstance(bmi, (int, float)):
                     activities_values[activity]["bmi"].append(bmi)
-                if type(glucose) == int or type(glucose) == float:
+                if isinstance(glucose, (int, float)):
                     activities_values[activity]["glucose"].append(glucose)
-                if type(stroke_risk) == int or type(stroke_risk) == float:
+                if isinstance(stroke_risk, (int, float)):
                     activities_values[activity]["stroke_risk"].append(stroke_risk)
 
             # build result dict

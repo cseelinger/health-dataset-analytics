@@ -128,7 +128,7 @@ class StatisticsModule:
             for row in self.dataset:
                 val = row.get(feature)
                 # Check whether the value is a number (int or float)
-                if type(val) == int or type(val) == float:
+                if isinstance(val, (int, float)):
                     values.append(val)
 
             # clculate statistics 
