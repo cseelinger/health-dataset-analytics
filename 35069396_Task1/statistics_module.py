@@ -124,40 +124,46 @@ class StatisticsModule:
         Takes a column name as input and calculates all relevant statistics.
         Returns a dictionary containing the results.
         """
-        try:
-            logging.info(f"Calculating descriptive statistics for {feature}")
-            # extract all valid (non-null and numeric) values from the column
-            values = []
-            for row in self.dataset:
-                val = row.get(feature)
-                # Check whether the value is a number (int or float)
-                if isinstance(val, (int, float)):
-                    values.append(val)
+        logging.info(f"Calculating descriptive statistics for {feature}")
 
-            # clculate statistics
-            mean = round(self.calculate_mean(values), 2)
-            median = round(self.calculate_median(values), 2)
-            mode = self.calculate_mode(values)
-            standard_deviation = round(self.calculate_standard_deviation(values), 2)
-            variance = round(self.calculate_variance(values), 2)
-            minimum = self.calculate_min(values)
-            maximum = self.calculate_max(values)
-            rangee = self.calculate_range(values)
+        if not self.dataset:
+            logging.error("No data in dataset found.")
+            return None
 
-            # 4. store them in a dictionary
-            statistics = {
-                "Feature": feature,
-                "Count": len(values),
-                "Mean": mean,
-                "Median": median,
-                "Mode": mode,
-                "Standard Deviation": standard_deviation,
-                "Variance": variance,
-                "Minimum": minimum,
-                "Maximum": maximum,
-                "Range": rangee,
-            }
+        # extract all valid (non-null and numeric) values from the column
+        values = []
+        for row in self.dataset:
+            val = row.get(feature)
+            # Check whether the value is a number (int or float)
+            if isinstance(val, (int, float)):
+                values.append(val)
+        
+        if not values:
+            logging.warning("No descriptive statistics found.")
+            return None
 
-            return statistics
-        except Exception as e:
-            logging.error(f"ERROR in {feature}: {e}")
+        # clculate statistics
+        mean = round(self.calculate_mean(values), 2)
+        median = round(self.calculate_median(values), 2)
+        mode = self.calculate_mode(values)
+        standard_deviation = round(self.calculate_standard_deviation(values), 2)
+        variance = round(self.calculate_variance(values), 2)
+        minimum = self.calculate_min(values)
+        maximum = self.calculate_max(values)
+        rangee = self.calculate_range(values)
+
+        # 4. store them in a dictionary
+        statistics = {
+            "Feature": feature,
+            "Count": len(values),
+            "Mean": mean,
+            "Median": median,
+            "Mode": mode,
+            "Standard Deviation": standard_deviation,
+            "Variance": variance,
+            "Minimum": minimum,
+            "Maximum": maximum,
+            "Range": rangee,
+        }
+
+        return statistics

@@ -51,8 +51,8 @@ class LoadDataset:
                 # get header from first row
                 try:
                     headers = next(loaded_data)
-                except Exception:
-                    logging.error("The file is empty.")
+                except Exception as e:
+                    logging.error(f"The file is empty. Information: {e}")
                     return None
 
                 row_number = 1

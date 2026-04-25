@@ -62,9 +62,10 @@ class QueryModule:
                 if hypertension == 1 and (
                     smoke_status == "Smokes" or smoke_status == "Formerly smoked"
                 ):
-                    age = int(row.get("Age"))
+                    age = row.get("Age")
                     # add age to ages list
                     ages.append(age)
+
             if not ages:
                 return []
 
@@ -108,6 +109,7 @@ class QueryModule:
                         ages.append(age)
                     if isinstance(glucose, (int, float)):
                         glucoses.append(glucose)
+
             if not ages or not glucoses:
                 return []
 
@@ -147,8 +149,8 @@ class QueryModule:
             collected_data = {}
             for row in self.dataset:
                 # get necessary self.dataset
-                hypertension = int(row.get("Hypertension"))
-                stroke = int(row.get("Stroke Occurrence"))
+                hypertension = row.get("Hypertension")
+                stroke = row.get("Stroke Occurrence")
                 gender = row.get("Gender")
                 age = row.get("Age")
 
@@ -282,12 +284,14 @@ class QueryModule:
                 # just patients with stroke
                 if stroke != 1:
                     continue
-                # add age to rural list
-                if residence == "Rural":
-                    ages_rural.append(age)
-                # add age to urban list
-                if residence == "Urban":
-                    ages_urban.append(age)
+
+                if isinstance(age, (int, float)):
+                    # add age to rural list
+                    if residence == "Rural":
+                        ages_rural.append(age)
+                    # add age to urban list
+                    if residence == "Urban":
+                        ages_urban.append(age)
 
             # build result dicts
             rural_dict = {}
@@ -499,31 +503,30 @@ class QueryModule:
             logging.info("Start query x: Filter patients by given criteria.")
             if not self.dataset:
                 return []
-            # get keys
-            keys = list(self.dataset[0].keys())
+                
             # set string for each parameter
             params = {
-                keys[1]: age,
-                keys[2]: gender,
-                keys[3]: hypertension,
-                keys[4]: heartDisease,
-                keys[5]: everMarried,
-                keys[6]: worktype,
-                keys[7]: residenceType,
-                keys[8]: averageGlucoseLevel,
-                keys[9]: bmi,
-                keys[10]: smokingStatus,
-                keys[11]: physicalActivity,
-                keys[12]: dietaryHabits,
-                keys[13]: alcoholConsumption,
-                keys[14]: chronicStress,
-                keys[15]: sleepHours,
-                keys[16]: familyHistoryOfStroke,
-                keys[17]: educationLevel,
-                keys[18]: incomeLevel,
-                keys[19]: strokeRiskScore,
-                keys[20]: region,
-                keys[21]: strokeOccurrence,
+                "Age": age,
+                "Gender": gender,
+                "Hypertension": hypertension,
+                "Heart Disease": heartDisease,
+                "Ever Married": everMarried,
+                "Work Type": worktype,
+                "Residence Type": residenceType,
+                "Average Glucose Level": averageGlucoseLevel,
+                "BMI": bmi,
+                "Smoking Status": smokingStatus,
+                "Physical Activity": physicalActivity,
+                "Dietary Habits": dietaryHabits,
+                "Alcohol Consumption": alcoholConsumption,
+                "Chronic Stress": chronicStress,
+                "Sleep Hours": sleepHours,
+                "Family History of Stroke": familyHistoryOfStroke,
+                "Education Level": educationLevel,
+                "Income Level": incomeLevel,
+                "Stroke Risk Score": strokeRiskScore,
+                "Region": region,
+                "Stroke Occurrence": strokeOccurrence,
             }
             result = []
             for row in self.dataset:
