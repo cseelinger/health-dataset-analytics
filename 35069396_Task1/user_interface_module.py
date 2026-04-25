@@ -22,13 +22,64 @@ import logging
 
 class UserInterface:
     def __init__(self, data):
-        self.dataset = data
         self.queries = QueryModule(data)
         self.statistics = StatisticsModule(data)
 
         self.last_left_result = []
         self.last_right_result = []
 
+    # --------------------------------------
+    # Some helper methods
+    # --------------------------------------
+    def get_int_or_none(self, integer):
+        """
+        Return int if parsable into int
+        """
+        value = integer.get().strip()
+        if value == "":
+            return None
+        try:
+            return int(value)
+        except ValueError:
+            messagebox.showerror(title="ERROR", message=f"{value} is not an integer.")
+            return None
+
+    def get_float_or_none(self, number):
+        """
+        Return float if parsable into float
+        """
+        value = number.get().strip()
+        if value == "":
+            return None
+        try:
+            return float(value)
+        except ValueError:
+            messagebox.showerror(title="ERROR", message=f"{value} is not a float.")
+            return None
+
+    def get_string_or_none(self, value):
+        """
+        Return None if nothing is written in the field
+        """
+        if value == "":
+            return None
+        return value
+
+    def get_bool_or_none(self, value):
+        """
+        Convert Yes/No into booleans
+        """
+        if value == "Yes":
+            return 1
+        elif value == "No":
+            return 0
+        return None
+
+    # ---------------------------------
+    # Start interface
+    # 1. build left side of the window
+    # 2. build right side of the window
+    # ---------------------------------
     def start_interface(self):
         """
         Initialize tkinter Interface
@@ -55,6 +106,241 @@ class UserInterface:
 
         self.root.mainloop()
 
+    def build_left_side(self):
+        """
+        Build everything placed/written on the left side of the window
+        """
+        # heading
+        self.left_title = tk.Label(
+            self.left_frame, text="Queries", font=("Arial", 16, "bold")
+        )
+        self.left_title.pack(anchor="w", pady=(0, 10))
+
+        # dropdown
+        self.left_var = tk.StringVar()
+        self.left_var.set("Please choose")
+
+        self.query_descriptions = [
+            "Smokers with Hypertension",
+            "Patients with Heart Disease",
+            "Patients with Hypertension, with/without Stroke, sort by Gender",
+            "Average Values of Physical Activity Levels",
+            "Urban vs Rural: Average Values of Stroke Patients",
+            "Stroke vs no Stroke: Dietary Habits",
+            "Patients whose Hypertension resulted in a Stroke",
+            "Patients with Heart Disease and Stroke",
+            "Average Sleep Hours of patients with and without Stroke",
+            "Filter patients by following criteria:",
+            "Categorize patients into Stroke Risk Groups",
+            "Patient summary for each region of living",
+        ]
+
+        self.left_menu = tk.OptionMenu(
+            self.left_frame, self.left_var, *self.query_descriptions
+        )
+        self.left_menu.pack(anchor="w", fill="x")
+
+        # run button
+        self.left_run_button = tk.Button(
+            self.left_frame, text="Run", command=self.run_query
+        )
+        self.left_run_button.pack(anchor="w", pady=(10, 10))
+
+        # result area
+        self.left_result_text = tk.Text(self.left_frame, height=20, width=55)
+        self.left_result_text.pack(fill="both", expand=True)
+
+        # export button
+        self.left_export_button = tk.Button(
+            self.left_frame, text="Export Results", command=self.export_left_result
+        )
+        self.left_export_button.pack(anchor="w", pady=(10, 0))
+
+    def build_right_side(self):
+        """
+        Build everything placed/written on the right side of the window
+        """
+        # heading
+        self.right_title = tk.Label(
+            self.right_frame, text="Descriptive Statistics", font=("Arial", 16, "bold")
+        )
+        self.right_title.pack(anchor="w", pady=(0, 10))
+
+        # dropdown
+        self.right_var = tk.StringVar()
+        self.right_var.set("Please choose")
+
+        self.right_options = [
+            "Age",
+            "BMI",
+            "Average Glucose Level",
+            "Sleep Hours",
+            "Stroke Risk Score",
+        ]
+
+        self.right_menu = tk.OptionMenu(
+            self.right_frame, self.right_var, *self.right_options
+        )
+        self.right_menu.pack(anchor="w", fill="x")
+
+        # run button
+        self.right_run_button = tk.Button(
+            self.right_frame, text="Run", command=self.run_descriptive_statistics
+        )
+        self.right_run_button.pack(anchor="w", pady=(10, 10))
+
+        # result area
+        self.right_result_text = tk.Text(self.right_frame, height=20, width=55)
+        self.right_result_text.pack(fill="both", expand=True)
+
+        # export button
+        self.right_export_button = tk.Button(
+            self.right_frame, text="Export Results", command=self.export_right_result
+        )
+        self.right_export_button.pack(anchor="w", pady=(10, 0))
+
+    # ------------------
+    # Run specific query
+    # ------------------
+    def run_query(self):
+        """
+        Run the query selected in the drop down menu.
+        """
+        selection = self.left_var.get()
+
+        if selection == "Smokers with Hypertension":
+            result = self.queries.query_smokers_hypertension()
+        elif selection == "Patients with Heart Disease":
+            result = self.queries.query_heart_disease()
+        elif (
+            selection
+            == "Patients with Hypertension, with/without Stroke, sort by Gender"
+        ):
+            result = self.queries.query_hypertension_stroke_by_gender()
+        elif selection == "Average Values of Physical Activity Levels":
+            result = self.queries.query_averages_physical_activity_level()
+        elif selection == "Urban vs Rural: Average Values of Stroke Patients":
+            result = self.queries.query_urban_vs_rural_areas_with_stroke()
+        elif selection == "Stroke vs no Stroke: Dietary Habits":
+            result = self.queries.query_dietary_habits()
+        elif selection == "Patients whose Hypertension resulted in a Stroke":
+            result = self.queries.query_hypertension_results_in_stroke()
+        elif selection == "Patients with Heart Disease and Stroke":
+            result = self.queries.query_heart_diseases_and_stroke()
+        elif selection == "Average Sleep Hours of patients with and without Stroke":
+            result = self.queries.query_average_sleep_hours()
+        elif selection == "Filter patients by following criteria:":
+            self.open_window_for_filter_criteria()
+            return
+        elif selection == "Categorize patients into Stroke Risk Groups":
+            result = self.queries.query_group_patients_stroke_risk()
+        elif selection == "Patient summary for each region of living":
+            result = self.queries.query_summary_report_for_region()
+        else:
+            messagebox.showwarning(title="WARNING", message="No query is chosen.")
+            return
+
+        if not result:
+            messagebox.showwarning(
+                title="WARNING", message="No data could be calculated."
+            )
+            return
+
+        self.last_left_result = result
+        self.show_result(self.left_result_text, result)
+        self.left_export_button.config(state=tk.NORMAL)
+
+    def run_descriptive_statistics(self):
+        """
+        Run the descriptive statistics method from the statistics module.
+        """
+        selection = self.right_var.get()
+
+        if selection == "Please choose":
+            messagebox.showwarning(title="WARNING", message="No feature is chosen.")
+            return
+
+        result = self.statistics.get_descriptive_statistics_for_feature(selection)
+
+        if result is None:
+            self.last_right_result = []
+        else:
+            self.last_right_result = [result]
+
+        self.show_result(self.right_result_text, result)
+        self.right_export_button.config(state=tk.NORMAL)
+
+    # --------------------------------------------
+    # Show and export results in left/right window
+    # --------------------------------------------
+    def show_result(self, text_widget, result):
+        """
+        Display result under the drop down menu, calculated by the query module.
+        """
+        text_widget.delete("1.0", tk.END)
+
+        if not result:
+            text_widget.insert(tk.END, "No suitable patients found.")
+            return
+
+        if isinstance(result, dict):
+            for key, value in result.items():
+                text_widget.insert(tk.END, f"{key}: {value}\n")
+            return
+
+        if isinstance(result, list):
+            for item in result:
+                if isinstance(item, dict):
+                    for key, value in item.items():
+                        text_widget.insert(tk.END, f"{key}: {value}\n")
+                    text_widget.insert(tk.END, "\n")
+                else:
+                    text_widget.insert(tk.END, str(item) + "\n")
+            return
+
+        text_widget.insert(tk.END, str(result))
+
+    def export_left_result(self):
+        self.export_result("left")
+
+    def export_right_result(self):
+        self.export_result("right")
+
+    def export_result(self, side):
+        """
+        Export the result of the descriptive statistics to a csv file.
+        """
+        data_to_export = (
+            self.last_left_result if side == "left" else self.last_right_result
+        )
+
+        if not data_to_export:
+            messagebox.showwarning(
+                title="WARNING", message="No result available for export."
+            )
+            return
+
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
+        )
+
+        if not filename:
+            return
+
+        success = self.queries.export_to_csv(data_to_export, filename)
+
+        if success:
+            messagebox.showinfo(
+                title="SUCCESS", message="Result exported successfully."
+            )
+        else:
+            messagebox.showerror(title="ERROR", message="Export failed.")
+
+    # ------------------------------------------------------
+    # Query: Filter patients by following criteria
+    # 1. Prepare the variables for the filter criteria query
+    # 2. Open window to select/insert information for filter
+    # ------------------------------------------------------
     def build_variables_for_filter_criteria(self, parent):
         """
         Build every line to build input fields for the filter criteria method
@@ -250,99 +536,99 @@ class UserInterface:
         )
 
         # -----------------------------------
-        # Layout inside filter_frame
+        # Layout inside window
         # -----------------------------------
         # age
-        self.age_label.grid(row=0, column=0, sticky="w", padx=5, pady=5)
-        self.age_entry.grid(row=0, column=1, sticky="ew", padx=5, pady=5)
-        self.min_age_label.grid(row=1, column=0, sticky="w", padx=5, pady=5)
-        self.min_age_entry.grid(row=1, column=1, sticky="ew", padx=5, pady=5)
-        self.max_age_label.grid(row=2, column=0, sticky="w", padx=5, pady=5)
-        self.max_age_entry.grid(row=2, column=1, sticky="ew", padx=5, pady=5)
+        self.age_label.grid(row=0, column=0, sticky="w", padx=4, pady=4)
+        self.age_entry.grid(row=0, column=1, sticky="ew", padx=4, pady=4)
+        self.min_age_label.grid(row=1, column=0, sticky="w", padx=4, pady=4)
+        self.min_age_entry.grid(row=1, column=1, sticky="ew", padx=4, pady=4)
+        self.max_age_label.grid(row=2, column=0, sticky="w", padx=4, pady=4)
+        self.max_age_entry.grid(row=2, column=1, sticky="ew", padx=4, pady=4)
         # gender
-        self.gender_label.grid(row=3, column=0, sticky="w", padx=5, pady=5)
-        self.gender_menu.grid(row=3, column=1, sticky="ew", padx=5, pady=5)
+        self.gender_label.grid(row=3, column=0, sticky="w", padx=4, pady=4)
+        self.gender_menu.grid(row=3, column=1, sticky="ew", padx=4, pady=4)
         # hypertension
-        self.hypertension_label.grid(row=4, column=0, sticky="w", padx=5, pady=5)
-        self.hypertension_menu.grid(row=4, column=1, sticky="ew", padx=5, pady=5)
+        self.hypertension_label.grid(row=4, column=0, sticky="w", padx=4, pady=4)
+        self.hypertension_menu.grid(row=4, column=1, sticky="ew", padx=4, pady=4)
         # heart disease
-        self.heart_disease_label.grid(row=5, column=0, sticky="w", padx=5, pady=5)
-        self.heart_disease_menu.grid(row=5, column=1, sticky="ew", padx=5, pady=5)
+        self.heart_disease_label.grid(row=5, column=0, sticky="w", padx=4, pady=4)
+        self.heart_disease_menu.grid(row=5, column=1, sticky="ew", padx=4, pady=4)
         # ever married
-        self.ever_married_label.grid(row=6, column=0, sticky="w", padx=5, pady=5)
-        self.ever_married_menu.grid(row=6, column=1, sticky="ew", padx=5, pady=5)
+        self.ever_married_label.grid(row=6, column=0, sticky="w", padx=4, pady=4)
+        self.ever_married_menu.grid(row=6, column=1, sticky="ew", padx=4, pady=4)
         # worktype
-        self.worktype_label.grid(row=7, column=0, sticky="w", padx=5, pady=5)
-        self.worktype_menu.grid(row=7, column=1, sticky="ew", padx=5, pady=5)
+        self.worktype_label.grid(row=7, column=0, sticky="w", padx=4, pady=4)
+        self.worktype_menu.grid(row=7, column=1, sticky="ew", padx=4, pady=4)
         # residence type
-        self.residence_label.grid(row=8, column=0, sticky="w", padx=5, pady=5)
-        self.residence_menu.grid(row=8, column=1, sticky="ew", padx=5, pady=5)
+        self.residence_label.grid(row=8, column=0, sticky="w", padx=4, pady=4)
+        self.residence_menu.grid(row=8, column=1, sticky="ew", padx=4, pady=4)
         # Glucose
-        self.glucose_label.grid(row=9, column=0, sticky="w", padx=5, pady=5)
-        self.glucose_entry.grid(row=9, column=1, sticky="ew", padx=5, pady=5)
-        self.min_glucose_label.grid(row=10, column=0, sticky="w", padx=5, pady=5)
-        self.min_glucose_entry.grid(row=10, column=1, sticky="ew", padx=5, pady=5)
-        self.max_glucose_label.grid(row=11, column=0, sticky="w", padx=5, pady=5)
-        self.max_glucose_entry.grid(row=11, column=1, sticky="ew", padx=5, pady=5)
+        self.glucose_label.grid(row=9, column=0, sticky="w", padx=4, pady=4)
+        self.glucose_entry.grid(row=9, column=1, sticky="ew", padx=4, pady=4)
+        self.min_glucose_label.grid(row=10, column=0, sticky="w", padx=4, pady=4)
+        self.min_glucose_entry.grid(row=10, column=1, sticky="ew", padx=4, pady=4)
+        self.max_glucose_label.grid(row=11, column=0, sticky="w", padx=4, pady=4)
+        self.max_glucose_entry.grid(row=11, column=1, sticky="ew", padx=4, pady=4)
         # bmi
-        self.bmi_label.grid(row=12, column=0, sticky="w", padx=5, pady=5)
-        self.bmi_entry.grid(row=12, column=1, sticky="ew", padx=5, pady=5)
-        self.min_bmi_label.grid(row=13, column=0, sticky="w", padx=5, pady=5)
-        self.min_bmi_entry.grid(row=13, column=1, sticky="ew", padx=5, pady=5)
-        self.max_bmi_label.grid(row=14, column=0, sticky="w", padx=5, pady=5)
-        self.max_bmi_entry.grid(row=14, column=1, sticky="ew", padx=5, pady=5)
+        self.bmi_label.grid(row=12, column=0, sticky="w", padx=4, pady=4)
+        self.bmi_entry.grid(row=12, column=1, sticky="ew", padx=4, pady=4)
+        self.min_bmi_label.grid(row=13, column=0, sticky="w", padx=4, pady=4)
+        self.min_bmi_entry.grid(row=13, column=1, sticky="ew", padx=4, pady=4)
+        self.max_bmi_label.grid(row=14, column=0, sticky="w", padx=4, pady=4)
+        self.max_bmi_entry.grid(row=14, column=1, sticky="ew", padx=4, pady=4)
         # smoking status
-        self.smoking_label.grid(row=15, column=0, sticky="w", padx=5, pady=5)
-        self.smoking_menu.grid(row=15, column=1, sticky="ew", padx=5, pady=5)
+        self.smoking_label.grid(row=15, column=0, sticky="w", padx=4, pady=4)
+        self.smoking_menu.grid(row=15, column=1, sticky="ew", padx=4, pady=4)
         # physical activity
-        self.physical_activity_label.grid(row=1, column=2, sticky="w", padx=5, pady=5)
-        self.physical_activity_menu.grid(row=1, column=3, sticky="ew", padx=5, pady=5)
+        self.physical_activity_label.grid(row=1, column=2, sticky="w", padx=4, pady=4)
+        self.physical_activity_menu.grid(row=1, column=3, sticky="ew", padx=4, pady=4)
         # dietary habits
-        self.dietary_label.grid(row=2, column=2, sticky="w", padx=5, pady=5)
-        self.dietary_menu.grid(row=2, column=3, sticky="ew", padx=5, pady=5)
+        self.dietary_label.grid(row=2, column=2, sticky="w", padx=4, pady=4)
+        self.dietary_menu.grid(row=2, column=3, sticky="ew", padx=4, pady=4)
         # alcohol consumption
-        self.alcohol_label.grid(row=3, column=2, sticky="w", padx=5, pady=5)
-        self.alcohol_menu.grid(row=3, column=3, sticky="ew", padx=5, pady=5)
+        self.alcohol_label.grid(row=3, column=2, sticky="w", padx=4, pady=4)
+        self.alcohol_menu.grid(row=3, column=3, sticky="ew", padx=4, pady=4)
         # chronic stress
-        self.stress_label.grid(row=4, column=2, sticky="w", padx=5, pady=5)
-        self.stress_menu.grid(row=4, column=3, sticky="ew", padx=5, pady=5)
+        self.stress_label.grid(row=4, column=2, sticky="w", padx=4, pady=4)
+        self.stress_menu.grid(row=4, column=3, sticky="ew", padx=4, pady=4)
         # sleep hours
-        self.sleep_label.grid(row=5, column=2, sticky="w", padx=5, pady=5)
-        self.sleep_entry.grid(row=5, column=3, sticky="ew", padx=5, pady=5)
-        self.min_sleep_label.grid(row=6, column=2, sticky="w", padx=5, pady=5)
-        self.min_sleep_entry.grid(row=6, column=3, sticky="ew", padx=5, pady=5)
-        self.max_sleep_label.grid(row=7, column=2, sticky="w", padx=5, pady=5)
-        self.max_sleep_entry.grid(row=7, column=3, sticky="ew", padx=5, pady=5)
+        self.sleep_label.grid(row=5, column=2, sticky="w", padx=4, pady=4)
+        self.sleep_entry.grid(row=5, column=3, sticky="ew", padx=4, pady=4)
+        self.min_sleep_label.grid(row=6, column=2, sticky="w", padx=4, pady=4)
+        self.min_sleep_entry.grid(row=6, column=3, sticky="ew", padx=4, pady=4)
+        self.max_sleep_label.grid(row=7, column=2, sticky="w", padx=4, pady=4)
+        self.max_sleep_entry.grid(row=7, column=3, sticky="ew", padx=4, pady=4)
         # family stroke history
-        self.family_label.grid(row=8, column=2, sticky="w", padx=5, pady=5)
-        self.family_menu.grid(row=8, column=3, sticky="ew", padx=5, pady=5)
+        self.family_label.grid(row=8, column=2, sticky="w", padx=4, pady=4)
+        self.family_menu.grid(row=8, column=3, sticky="ew", padx=4, pady=4)
         # education level
-        self.education_label.grid(row=9, column=2, sticky="w", padx=5, pady=5)
-        self.education_menu.grid(row=9, column=3, sticky="ew", padx=5, pady=5)
+        self.education_label.grid(row=9, column=2, sticky="w", padx=4, pady=4)
+        self.education_menu.grid(row=9, column=3, sticky="ew", padx=4, pady=4)
         # income level
-        self.income_label.grid(row=10, column=2, sticky="w", padx=5, pady=5)
-        self.income_menu.grid(row=10, column=3, sticky="ew", padx=5, pady=5)
+        self.income_label.grid(row=10, column=2, sticky="w", padx=4, pady=4)
+        self.income_menu.grid(row=10, column=3, sticky="ew", padx=4, pady=4)
         # stroke risk score
-        self.stroke_risk_label.grid(row=11, column=2, sticky="w", padx=5, pady=5)
-        self.stroke_risk_entry.grid(row=11, column=3, sticky="ew", padx=5, pady=5)
-        self.min_stroke_risk_label.grid(row=12, column=2, sticky="w", padx=5, pady=5)
-        self.min_stroke_risk_entry.grid(row=12, column=3, sticky="ew", padx=5, pady=5)
-        self.max_stroke_risk_label.grid(row=13, column=2, sticky="w", padx=5, pady=5)
-        self.max_stroke_risk_entry.grid(row=13, column=3, sticky="ew", padx=5, pady=5)
+        self.stroke_risk_label.grid(row=11, column=2, sticky="w", padx=4, pady=4)
+        self.stroke_risk_entry.grid(row=11, column=3, sticky="ew", padx=4, pady=4)
+        self.min_stroke_risk_label.grid(row=12, column=2, sticky="w", padx=4, pady=4)
+        self.min_stroke_risk_entry.grid(row=12, column=3, sticky="ew", padx=4, pady=4)
+        self.max_stroke_risk_label.grid(row=13, column=2, sticky="w", padx=4, pady=4)
+        self.max_stroke_risk_entry.grid(row=13, column=3, sticky="ew", padx=4, pady=4)
         # region
-        self.region_label.grid(row=14, column=2, sticky="w", padx=5, pady=5)
-        self.region_menu.grid(row=14, column=3, sticky="ew", padx=5, pady=5)
+        self.region_label.grid(row=14, column=2, sticky="w", padx=4, pady=4)
+        self.region_menu.grid(row=14, column=3, sticky="ew", padx=4, pady=4)
         # stroke occurrence
-        self.stroke_occ_label.grid(row=15, column=2, sticky="w", padx=5, pady=5)
-        self.stroke_occ_menu.grid(row=15, column=3, sticky="ew", padx=5, pady=5)
+        self.stroke_occ_label.grid(row=15, column=2, sticky="w", padx=4, pady=4)
+        self.stroke_occ_menu.grid(row=15, column=3, sticky="ew", padx=4, pady=4)
 
-    def open_filter_window(self):
+    def open_window_for_filter_criteria(self):
         """
         Open a new window for selecting filter criteria.
         """
         self.filter_window = tk.Toplevel(self.root)
         self.filter_window.title("Filter Patients")
-        self.filter_window.geometry("700x800")
+        self.filter_window.geometry("650x650")
 
         self.filter_frame = tk.Frame(self.filter_window, padx=10, pady=10)
         self.filter_frame.pack(fill="both", expand=True)
@@ -353,7 +639,7 @@ class UserInterface:
         button_frame.pack(fill="x", side="bottom")
 
         ok_button = tk.Button(
-            button_frame, text="OK", command=self.run_filter_query_from_window
+            button_frame, text="OK", command=self.get_all_inserted_filter_from_window
         )
         ok_button.pack(side="left")
 
@@ -362,7 +648,7 @@ class UserInterface:
         )
         quit_button.pack(side="right")
 
-    def run_filter_query_from_window(self):
+    def get_all_inserted_filter_from_window(self):
         """
         Read all filter values from the filter window and run the filter query.
         """
@@ -485,287 +771,3 @@ class UserInterface:
         self.left_export_button.config(state=tk.NORMAL)
 
         self.filter_window.destroy()
-
-    def build_left_side(self):
-        """
-        Build everything placed/written on the left side of the window
-        """
-        # heading
-        self.left_title = tk.Label(
-            self.left_frame, text="Queries", font=("Arial", 16, "bold")
-        )
-        self.left_title.pack(anchor="w", pady=(0, 10))
-
-        # dropdown
-        self.left_var = tk.StringVar()
-        self.left_var.set("Please choose")
-
-        self.query_descriptions = [
-            "Smokers with Hypertension",
-            "Patients with Heart Disease",
-            "Patients with Hypertension, with/without Stroke, sort by Gender",
-            "Average Values of Physical Activity Levels",
-            "Urban vs Rural: Average Values of Stroke Patients",
-            "Stroke vs no Stroke: Dietary Habits",
-            "Patients whose Hypertension resulted in a Stroke",
-            "Patients with Heart Disease and Stroke",
-            "Average Sleep Hours of patients with and without Stroke",
-            "Filter patients by following criteria:",
-            "Categorize patients into Stroke Risk Groups",
-            "Patient summary for each region of living",
-        ]
-
-        self.left_menu = tk.OptionMenu(
-            self.left_frame, self.left_var, *self.query_descriptions
-        )
-        self.left_menu.pack(anchor="w", fill="x")
-
-        # run button
-        self.left_run_button = tk.Button(
-            self.left_frame, text="Run", command=self.run_query
-        )
-        self.left_run_button.pack(anchor="w", pady=(10, 10))
-
-        # result area
-        self.left_result_text = tk.Text(self.left_frame, height=20, width=55)
-        self.left_result_text.pack(fill="both", expand=True)
-
-        # export button
-        self.left_export_button = tk.Button(
-            self.left_frame, text="Export Results", command=self.export_left_result
-        )
-        self.left_export_button.pack(anchor="w", pady=(10, 0))
-
-    def build_right_side(self):
-        """
-        Build everything placed/written on the right side of the window
-        """
-        # heading
-        self.right_title = tk.Label(
-            self.right_frame, text="Descriptive Statistics", font=("Arial", 16, "bold")
-        )
-        self.right_title.pack(anchor="w", pady=(0, 10))
-
-        # dropdown
-        self.right_var = tk.StringVar()
-        self.right_var.set("Please choose")
-
-        self.right_options = [
-            "Age",
-            "BMI",
-            "Average Glucose Level",
-            "Sleep Hours",
-            "Stroke Risk Score",
-        ]
-
-        self.right_menu = tk.OptionMenu(
-            self.right_frame, self.right_var, *self.right_options
-        )
-        self.right_menu.pack(anchor="w", fill="x")
-
-        # run button
-        self.right_run_button = tk.Button(
-            self.right_frame, text="Run", command=self.run_descriptive_statistics
-        )
-        self.right_run_button.pack(anchor="w", pady=(10, 10))
-
-        # result area
-        self.right_result_text = tk.Text(self.right_frame, height=20, width=55)
-        self.right_result_text.pack(fill="both", expand=True)
-
-        # export button
-        self.right_export_button = tk.Button(
-            self.right_frame, text="Export Results", command=self.export_right_result
-        )
-        self.right_export_button.pack(anchor="w", pady=(10, 0))
-
-    def get_int_or_none(self, integer):
-        """
-        Return int if parsable into int
-        """
-        value = integer.get().strip()
-        if value == "":
-            return None
-        try:
-            return int(value)
-        except ValueError:
-            messagebox.showerror(title="ERROR", message=f"{value} is not an integer.")
-            return None
-
-    def get_float_or_none(self, number):
-        """
-        Return float if parsable into float
-        """
-        value = number.get().strip()
-        if value == "":
-            return None
-        try:
-            return float(value)
-        except ValueError:
-            messagebox.showerror(title="ERROR", message=f"{value} is not a float.")
-            return None
-
-    def get_string_or_none(self, value):
-        """
-        Return None if nothing is written in the field
-        """
-        if value == "":
-            return None
-        return value
-
-    def get_bool_or_none(self, value):
-        """
-        Convert Yes/No into booleans
-        """
-        if value == "Yes":
-            return 1
-        elif value == "No":
-            return 0
-        return None
-
-    def run_query(self):
-        """
-        Run the query selected in the drop down menu.
-        """
-        selection = self.left_var.get()
-
-        if selection == "Smokers with Hypertension":
-            result = self.queries.query_smokers_hypertension()
-        elif selection == "Patients with Heart Disease":
-            result = self.queries.query_heart_disease()
-        elif (
-            selection
-            == "Patients with Hypertension, with/without Stroke, sort by Gender"
-        ):
-            result = self.queries.query_hypertension_stroke_by_gender()
-        elif selection == "Average Values of Physical Activity Levels":
-            result = self.queries.query_averages_physical_activity_level()
-        elif selection == "Urban vs Rural: Average Values of Stroke Patients":
-            result = self.queries.query_urban_vs_rural_areas_with_stroke()
-        elif selection == "Stroke vs no Stroke: Dietary Habits":
-            result = self.queries.query_dietary_habits()
-        elif selection == "Patients whose Hypertension resulted in a Stroke":
-            result = self.queries.query_hypertension_results_in_stroke()
-        elif selection == "Patients with Heart Disease and Stroke":
-            result = self.queries.query_heart_diseases_and_stroke()
-        elif selection == "Average Sleep Hours of patients with and without Stroke":
-            result = self.queries.query_average_sleep_hours()
-        elif selection == "Filter patients by following criteria:":
-            self.open_filter_window()
-            return
-        elif selection == "Categorize patients into Stroke Risk Groups":
-            result = self.queries.query_group_patients_stroke_risk()
-        elif selection == "Patient summary for each region of living":
-            result = self.queries.query_summary_report_for_region()
-        else:
-            messagebox.showwarning(title="WARNING", message="No query is chosen.")
-            return
-
-        if not result:
-            messagebox.showwarning(
-                title="WARNING", message="No data could be calculated."
-            )
-            return
-
-        self.last_left_result = result
-        self.show_result(self.left_result_text, result)
-        self.left_export_button.config(state=tk.NORMAL)
-
-    def run_descriptive_statistics(self):
-        """
-        Run the descriptive statistics method from the statistics module.
-        """
-        selection = self.right_var.get()
-
-        if selection == "Please choose":
-            messagebox.showwarning(title="WARNING", message="No feature is chosen.")
-            return
-
-        result = self.statistics.get_descriptive_statistics_for_feature(selection)
-
-        if result is None:
-            self.last_right_result = []
-        else:
-            self.last_right_result = [result]
-
-        self.show_result(self.right_result_text, result)
-        self.right_export_button.config(state=tk.NORMAL)
-
-    def show_result(self, text_widget, result):
-        """
-        Display result under the drop down menu, calculated by the query module.
-        """
-        text_widget.delete("1.0", tk.END)
-
-        if not result:
-            text_widget.insert(tk.END, "No suitable patients found.")
-            return
-
-        if isinstance(result, dict):
-            for key, value in result.items():
-                text_widget.insert(tk.END, f"{key}: {value}\n")
-            return
-
-        if isinstance(result, list):
-            for item in result:
-                if isinstance(item, dict):
-                    for key, value in item.items():
-                        text_widget.insert(tk.END, f"{key}: {value}\n")
-                    text_widget.insert(tk.END, "\n")
-                else:
-                    text_widget.insert(tk.END, str(item) + "\n")
-            return
-
-        text_widget.insert(tk.END, str(result))
-
-    def export_left_result(self):
-        """
-        Export the result of a query to a csv file.
-        """
-        if not self.last_left_result:
-            messagebox.showwarning(
-                title="WARNING", message="No result available for export."
-            )
-            return
-
-        filename = filedialog.asksaveasfilename(
-            defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
-        )
-
-        if not filename:
-            return
-
-        success = self.queries.export_to_csv(self.last_left_result, filename)
-
-        if success:
-            messagebox.showinfo(
-                title="SUCCESS", message="Result exported successfully."
-            )
-        else:
-            messagebox.showerror(title="ERROR", message="Export failed.")
-
-    def export_right_result(self):
-        """
-        Export the result of the descriptive statistics to a csv file.
-        """
-        if not self.last_right_result:
-            messagebox.showwarning(
-                title="WARNING", message="No result available for export."
-            )
-            return
-
-        filename = filedialog.asksaveasfilename(
-            defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
-        )
-
-        if not filename:
-            return
-
-        success = self.queries.export_to_csv(self.last_right_result, filename)
-
-        if success:
-            messagebox.showinfo(
-                title="SUCCESS", message="Result exported successfully."
-            )
-        else:
-            messagebox.showerror(title="ERROR", message="Export failed.")
