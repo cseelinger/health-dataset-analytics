@@ -103,7 +103,6 @@ class LoadDataset:
             "",
             "nan",
             "NaN",
-            "nan",
             "none",
             "None",
             "null",
