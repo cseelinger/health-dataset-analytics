@@ -41,7 +41,7 @@ class UserInterface:
         try:
             return int(value)
         except ValueError:
-            messagebox.showerror(title="ERROR", message=f"{value} is not an integer.")
+            messagebox.showerror(title="ERROR", message=f"{value} is not an integer. Field will be ignored.")
             return None
 
     def get_float_or_none(self, number):
@@ -54,7 +54,7 @@ class UserInterface:
         try:
             return float(value)
         except ValueError:
-            messagebox.showerror(title="ERROR", message=f"{value} is not a float.")
+            messagebox.showerror(title="ERROR", message=f"{value} is not a float. Field will be ignored.")
             return None
 
     def get_string_or_none(self, value):
@@ -88,19 +88,21 @@ class UserInterface:
         self.root.title("Patient Health Analytics System")
         self.root.geometry("1000x600")
 
+        # create two columns
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
         self.root.grid_rowconfigure(0, weight=1)
 
-        self.left_frame = tk.Frame(self.root, padx=20, pady=20)
-        self.right_frame = tk.Frame(self.root, padx=20, pady=20)
+        self.left = tk.Frame(self.root, padx=20, pady=20)
+        self.right = tk.Frame(self.root, padx=20, pady=20)
 
-        self.left_frame.grid(row=0, column=0, sticky="nsew")
-        self.right_frame.grid(row=0, column=1, sticky="nsew")
+        self.left.grid(row=0, column=0, sticky="nsew")
+        self.right.grid(row=0, column=1, sticky="nsew")
 
         self.build_left_side()
         self.build_right_side()
 
+        # create quit button to end program
         self.quit_button = tk.Button(self.root, text="Quit", command=self.root.destroy)
         self.quit_button.grid(row=1, column=1, sticky="e", padx=20, pady=20)
 
@@ -112,11 +114,11 @@ class UserInterface:
         """
         # heading
         self.left_title = tk.Label(
-            self.left_frame, text="Queries", font=("Arial", 16, "bold")
+            self.left, text="Queries", font=("Arial", 16, "bold")
         )
         self.left_title.pack(anchor="w", pady=(0, 10))
 
-        # dropdown
+        # dropdown menu
         self.left_var = tk.StringVar()
         self.left_var.set("Please choose")
 
@@ -136,23 +138,23 @@ class UserInterface:
         ]
 
         self.left_menu = tk.OptionMenu(
-            self.left_frame, self.left_var, *self.query_descriptions
+            self.left, self.left_var, *self.query_descriptions
         )
         self.left_menu.pack(anchor="w", fill="x")
 
         # run button
         self.left_run_button = tk.Button(
-            self.left_frame, text="Run", command=self.run_query
+            self.left, text="Run", command=self.run_query
         )
         self.left_run_button.pack(anchor="w", pady=(10, 10))
 
-        # result area
-        self.left_result_text = tk.Text(self.left_frame, height=20, width=55)
+        # result field
+        self.left_result_text = tk.Text(self.left, height=20, width=55)
         self.left_result_text.pack(fill="both", expand=True)
 
         # export button
         self.left_export_button = tk.Button(
-            self.left_frame, text="Export Results", command=self.export_left_result
+            self.left, text="Export Results", command=self.export_left_result
         )
         self.left_export_button.pack(anchor="w", pady=(10, 0))
 
@@ -162,11 +164,11 @@ class UserInterface:
         """
         # heading
         self.right_title = tk.Label(
-            self.right_frame, text="Descriptive Statistics", font=("Arial", 16, "bold")
+            self.right, text="Descriptive Statistics", font=("Arial", 16, "bold")
         )
         self.right_title.pack(anchor="w", pady=(0, 10))
 
-        # dropdown
+        # dropdown menu
         self.right_var = tk.StringVar()
         self.right_var.set("Please choose")
 
@@ -179,23 +181,23 @@ class UserInterface:
         ]
 
         self.right_menu = tk.OptionMenu(
-            self.right_frame, self.right_var, *self.right_options
+            self.right, self.right_var, *self.right_options
         )
         self.right_menu.pack(anchor="w", fill="x")
 
         # run button
         self.right_run_button = tk.Button(
-            self.right_frame, text="Run", command=self.run_descriptive_statistics
+            self.right, text="Run", command=self.run_descriptive_statistics
         )
         self.right_run_button.pack(anchor="w", pady=(10, 10))
 
-        # result area
-        self.right_result_text = tk.Text(self.right_frame, height=20, width=55)
+        # result field
+        self.right_result_text = tk.Text(self.right, height=20, width=55)
         self.right_result_text.pack(fill="both", expand=True)
 
         # export button
         self.right_export_button = tk.Button(
-            self.right_frame, text="Export Results", command=self.export_right_result
+            self.right, text="Export Results", command=self.export_right_result
         )
         self.right_export_button.pack(anchor="w", pady=(10, 0))
 
@@ -207,7 +209,7 @@ class UserInterface:
         Run the query selected in the drop down menu.
         """
         selection = self.left_var.get()
-
+        # get query for selection
         if selection == "Smokers with Hypertension":
             result = self.queries.query_smokers_hypertension()
         elif selection == "Patients with Heart Disease":
@@ -245,10 +247,10 @@ class UserInterface:
                 title="WARNING", message="No data could be calculated."
             )
             return
-
+        # save the result for exporting now or later
         self.last_left_result = result
+        # show result in window field
         self.show_result(self.left_result_text, result)
-        self.left_export_button.config(state=tk.NORMAL)
 
     def run_descriptive_statistics(self):
         """
@@ -259,46 +261,34 @@ class UserInterface:
         if selection == "Please choose":
             messagebox.showwarning(title="WARNING", message="No feature is chosen.")
             return
-
+        # calculate descriptive statistics
         result = self.statistics.get_descriptive_statistics_for_feature(selection)
 
         if result is None:
             self.last_right_result = []
         else:
-            self.last_right_result = [result]
-
+            self.last_right_result = result
+        # show result in field in window
         self.show_result(self.right_result_text, result)
-        self.right_export_button.config(state=tk.NORMAL)
 
     # --------------------------------------------
     # Show and export results in left/right window
     # --------------------------------------------
-    def show_result(self, text_widget, result):
+    def show_result(self, text, result):
         """
         Display result under the drop down menu, calculated by the query module.
         """
-        text_widget.delete("1.0", tk.END)
+        text.delete("1.0", tk.END)
 
         if not result:
-            text_widget.insert(tk.END, "No suitable patients found.")
+            text.insert(tk.END, "No suitable patients found.")
             return
-
-        if isinstance(result, dict):
-            for key, value in result.items():
-                text_widget.insert(tk.END, f"{key}: {value}\n")
-            return
-
-        if isinstance(result, list):
-            for item in result:
-                if isinstance(item, dict):
-                    for key, value in item.items():
-                        text_widget.insert(tk.END, f"{key}: {value}\n")
-                    text_widget.insert(tk.END, "\n")
-                else:
-                    text_widget.insert(tk.END, str(item) + "\n")
-            return
-
-        text_widget.insert(tk.END, str(result))
+        # result is alsways returned as list []
+        # -> go through list and show result
+        for item in result:
+            for key, value in item.items():
+                text.insert(tk.END, f"{key}: {value}\n")
+            text.insert(tk.END, "\n")
 
     def export_left_result(self):
         self.export_result("left")
@@ -310,25 +300,26 @@ class UserInterface:
         """
         Export the result of the descriptive statistics to a csv file.
         """
+        # decide what result from which side should be exported
         data_to_export = (
             self.last_left_result if side == "left" else self.last_right_result
         )
-
+        # check if calculated data available for export
         if not data_to_export:
             messagebox.showwarning(
                 title="WARNING", message="No result available for export."
             )
             return
-
+        # open filedialog for choosing filename and path
         filename = filedialog.asksaveasfilename(
             defaultextension=".csv", filetypes=[("CSV files", "*.csv")]
         )
 
         if not filename:
             return
-
+        # export_to_csv returns true or false when exported
         success = self.queries.export_to_csv(data_to_export, filename)
-
+        # inform user about success or failing export
         if success:
             messagebox.showinfo(
                 title="SUCCESS", message="Result exported successfully."
@@ -343,7 +334,7 @@ class UserInterface:
     # ------------------------------------------------------
     def build_variables_for_filter_criteria(self, parent):
         """
-        Build every line to build input fields for the filter criteria method
+        Build every line in two columns to build input fields for the filter criteria method
         -> For every feature can be inserted or selected a value
         """
         parent.grid_columnconfigure(1, weight=1)
@@ -626,23 +617,26 @@ class UserInterface:
         """
         Open a new window for selecting filter criteria.
         """
+        # build window
         self.filter_window = tk.Toplevel(self.root)
         self.filter_window.title("Filter Patients")
         self.filter_window.geometry("650x650")
 
         self.filter_frame = tk.Frame(self.filter_window, padx=10, pady=10)
         self.filter_frame.pack(fill="both", expand=True)
-
+        
+        # build al variables to be set
         self.build_variables_for_filter_criteria(self.filter_frame)
-
+        
+        # build button OK
         button_frame = tk.Frame(self.filter_window, padx=10, pady=10)
         button_frame.pack(fill="x", side="bottom")
-
         ok_button = tk.Button(
             button_frame, text="OK", command=self.get_all_inserted_filter_from_window
         )
         ok_button.pack(side="left")
 
+        # build button QUIT
         quit_button = tk.Button(
             button_frame, text="Quit", command=self.filter_window.destroy
         )
@@ -765,9 +759,8 @@ class UserInterface:
                 title="WARNING", message="No data could be calculated."
             )
             return
-
+        # show result in field
         self.last_left_result = result
         self.show_result(self.left_result_text, result)
-        self.left_export_button.config(state=tk.NORMAL)
 
         self.filter_window.destroy()

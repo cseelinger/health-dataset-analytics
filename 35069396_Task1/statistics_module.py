@@ -137,7 +137,7 @@ class StatisticsModule:
             # Check whether the value is a number (int or float)
             if isinstance(val, (int, float)):
                 values.append(val)
-
+        
         if not values:
             logging.warning("No descriptive statistics found.")
             return None
@@ -166,4 +166,4 @@ class StatisticsModule:
             "Range": rangee,
         }
 
-        return statistics
+        return [statistics]
