@@ -1,6 +1,7 @@
 """
 Query_module that contains several functions for querying the loaded self.datasetset
 for various information and insights.
+
 """
 
 import csv

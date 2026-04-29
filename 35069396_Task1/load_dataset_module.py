@@ -1,10 +1,8 @@
 """
 The data to be retrieved will be temporarily stored in memory (for additional processing)
-using an appropriate data structure such as a dictionary or a list of dictionaries.
-This module should return a data structure (e.g., patient_data dictionary) that contains patient records
-with their corresponding health features.
-The module should also handle any data type conversions needed
-(e.g., converting numeric strings to integers or floats).
+using an appropriate data structure such as list of dictionaries.
+This module returns a data structure that contains patient records with their corresponding health features.
+The module also handles any data type conversions needed.
 
 """
 

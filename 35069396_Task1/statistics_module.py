@@ -1,12 +1,11 @@
 """
-This module should implement functions for statistical analysis of the dataset features.
-The statistical functions should include the following:
+This module implements functions for statistical analysis of the dataset features.
+The statistical functions include the following:
 mean, mode, median, standard deviation, minimum, maximum, variance, and range.
 These functions will be used by other modules to compute statistics for different patient groups.
-Additionally, implement a function that returns descriptive statistics for any specified numeric feature
-of the dataset. This function should accept a feature name as a parameter
-and return all relevant statistics (mean, median, mode, standard deviation, minimum, maximum, variance, range)
-for that feature.
+Additionally, a function is implemented that returns descriptive statistics for any specified numeric feature
+of the dataset. This function accepts a feature name as a parameter and returns all relevant statistics 
+(mean, median, mode, standard deviation, minimum, maximum, variance, range) for that feature.
 
 """
 

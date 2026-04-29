@@ -1,8 +1,8 @@
 """
 Module that produces a user interface. Usage of tkinter. The user interface provides the
-functionality for querying the system for any query in query_module and
-displaying the results. The queries and displayed results are user-friendly.
-The interface should include:
+functionality for querying the system for any query in query_module and displaying the results. 
+The queries and displayed results are user-friendly.
+The interface includes:
 i.	 A menu or selection system allowing users to choose which query or analysis to perform.
 ii.	 Input fields where necessary (e.g., for entering age ranges, selecting regions, or choosing
      filter criteria).
@@ -10,6 +10,7 @@ iii. A results display area that presents the output in a clear, readable format
 iv.	 An option to export query results to a CSV file.
 v.	 The ability to view descriptive statistics for any selected feature.
 vi.	 The option for users to continue using the system or quit when they are done.
+
 """
 
 import tkinter as tk

@@ -1,7 +1,8 @@
 """
-This module should import the rest of the modules and start the application.
-The user should be able to launch your application by navigating to the file tree
+This module imports the rest of the modules and starts the application.
+The user is able to launch the application by navigating to the file tree
 and running “python3 main.py” in the terminal.
+
 """
 
 from load_dataset_module import LoadDataset
