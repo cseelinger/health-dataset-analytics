@@ -27,11 +27,13 @@ def main():
         datefmt="%y-%m-%d %H:%M:%S",
     )
 
+    # load dataset
     loader = LoadDataset("data.csv")
     data = loader.load_dataset()
     if not data:
         logging.error(f"No data could be loaded. Please check your dataset.")
         return
+    # start user interface
     interface = UserInterface(data)
     interface.start_interface()
 

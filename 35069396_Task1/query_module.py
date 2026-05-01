@@ -10,6 +10,9 @@ from statistics_module import StatisticsModule
 
 
 class QueryModule:
+    """
+    Class to calculate all queries on the patient dataset
+    """
     def __init__(self, data):
         self.dataset = data
 

@@ -22,6 +22,9 @@ import logging
 
 
 class UserInterface:
+    """
+    Class to build the user interface of the analytics system
+    """
     def __init__(self, data):
         self.queries = QueryModule(data)
         self.statistics = StatisticsModule(data)

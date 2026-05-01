@@ -14,7 +14,7 @@ import logging
 
 class StatisticsModule:
     """
-    Class to perform statistical analyses on the patient dataset
+    Class to calculate statistical analyses on the patient dataset
     """
 
     def __init__(self, dataset):
